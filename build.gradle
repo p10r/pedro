@@ -1,0 +1,54 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    gradlePluginPortal()
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+  }
+}
+
+plugins {
+  id 'com.google.cloud.tools.jib' version '2.3.0'
+}
+
+jib {
+  container.mainClass = "de.p10r.buckKt"
+  to.image = 'docker_repo_user/docker_image_user'
+}
+
+repositories {
+  mavenCentral()
+}
+
+apply plugin: 'kotlin'
+
+compileKotlin.kotlinOptions.jvmTarget = "11"
+compileTestKotlin.kotlinOptions.jvmTarget = "11"
+compileTestKotlin.kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+test {
+  useJUnitPlatform()
+}
+
+dependencies {
+  implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+  implementation("org.http4k:http4k-core")
+  implementation("org.http4k:http4k-format-jackson")
+  implementation("org.http4k:http4k-server-undertow")
+  implementation("org.http4k:http4k-graphql")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+  testImplementation("org.http4k:http4k-testing-approval")
+  testImplementation("org.http4k:http4k-testing-chaos")
+  testImplementation("org.http4k:http4k-testing-hamkrest")
+  testImplementation("org.http4k:http4k-testing-strikt")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+  testImplementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+  implementation(platform("dev.forkhandles:forkhandles-bom:2.5.0.0"))
+  implementation("dev.forkhandles:result4k")
+}
+
