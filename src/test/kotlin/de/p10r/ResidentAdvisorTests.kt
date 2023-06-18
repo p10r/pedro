@@ -1,5 +1,6 @@
 package de.p10r
 
+import de.p10r.RAArtistResponse.RAData
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -35,14 +36,15 @@ abstract class ResidentAdvisorContract(
 }
 
 @EnabledIfSystemProperty(named = "run-e2e", matches = "true")
-class ProdResidentAdvisorTests : ResidentAdvisorContract(Uri.of("https://ra.co"), JavaHttpClient())
+class ProdResidentAdvisorTests :
+  ResidentAdvisorContract(Uri.of("https://ra.co"), JavaHttpClient())
 
 class ResidentAdvisorTests : ResidentAdvisorContract(
   uri = Uri.of("http://resident-advisor"),
   client = FakeRAServer(
     mapOf(
       RASlug("boysnoize") to RAArtistResponse(
-        RAArtistResponse.RAData(
+        RAData(
           RAArtist("943", "Boys Noize")
         )
       )
@@ -55,13 +57,14 @@ fun FakeRAServer(
 ): RoutingHttpHandler {
   return routes(
     "/graphql" bind Method.POST to { request ->
-      val matchingSlug = artistBySlugId.keys.find { it.toGetArtistQuery() == request.bodyString() }
+      val matchingSlug =
+        artistBySlugId.keys.find { it.toGetArtistQuery() == request.bodyString() }
       val artist =
         if (matchingSlug == null) null
         else artistBySlugId[matchingSlug]
 
       if (artist == null) {
-        Response(Status.OK).with(raArtistResponse of RAArtistResponse(RAArtistResponse.RAData(null)))
+        Response(Status.OK).with(raArtistResponse of RAArtistResponse(RAData(artist = null)))
       } else {
         Response(Status.OK).with(raArtistResponse of artist)
       }

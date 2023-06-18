@@ -12,7 +12,8 @@ import org.http4k.format.Jackson.auto
 
 val raArtistResponse = Body.auto<RAArtistResponse>().toLens()
 
-fun RASlug.toGetArtistQuery() = """{"query":"{\n    artist(slug:\"$value\") {\n id\n name\n }\n}\n","variables":{}}"""
+fun RASlug.toGetArtistQuery() =
+  """{"query":"{\n    artist(slug:\"$value\") {\n id\n name\n }\n}\n","variables":{}}"""
 
 class RAClient(
   raUri: Uri,
@@ -26,7 +27,9 @@ class RAClient(
       .header("Host", "ra.co")
       .header(
         "User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" +
+          " AppleWebKit/537.36 (KHTML, like Gecko)" +
+          " Chrome/113.0.0.0 Safari/537.36"
       )
       .header("Content-Type", "application/json")
       .body(slug.toGetArtistQuery())
