@@ -1,20 +1,17 @@
 package de.p10r
 
 import de.p10r.RAArtistResponse.RAData
+import de.p10r.RAEventsResponse.RADataWrapper.RAListing.RAEvent
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Uri
-import org.http4k.core.with
-import org.http4k.routing.RoutingHttpHandler
-import org.http4k.routing.bind
-import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import strikt.api.expectThat
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
+import java.time.LocalDate
+import java.time.Month
 
 abstract class ResidentAdvisorContract(
   val uri: Uri,
@@ -33,8 +30,20 @@ abstract class ResidentAdvisorContract(
     expectThat(RAClient(uri, client).getArtistBy(RASlug("this_artist_doesnt_exist")))
       .isEqualTo(null)
   }
+
+  @Test
+  fun `lists artists events`() {
+    expectThat(
+      raClient.getEventsFor(
+        raArtist = RAArtist("943", "Boys Noize"),
+        startDate = LocalDate.of(2023, Month.JUNE, 1)
+      )
+    ).contains(RAEvent("1708911"))
+  }
 }
 
+//These tests might get outdated because the queries are set to specific dates
+//Update the queries if needed
 @EnabledIfSystemProperty(named = "run-e2e", matches = "true")
 class ProdResidentAdvisorTests :
   ResidentAdvisorContract(Uri.of("https://ra.co"), JavaHttpClient())
@@ -52,22 +61,3 @@ class ResidentAdvisorTests : ResidentAdvisorContract(
   )
 )
 
-fun FakeRAServer(
-  artistBySlugId: Map<RASlug, RAArtistResponse>
-): RoutingHttpHandler {
-  return routes(
-    "/graphql" bind Method.POST to { request ->
-      val matchingSlug =
-        artistBySlugId.keys.find { it.toGetArtistQuery() == request.bodyString() }
-      val artist =
-        if (matchingSlug == null) null
-        else artistBySlugId[matchingSlug]
-
-      if (artist == null) {
-        Response(Status.OK).with(raArtistResponse of RAArtistResponse(RAData(artist = null)))
-      } else {
-        Response(Status.OK).with(raArtistResponse of artist)
-      }
-    }
-  )
-}
