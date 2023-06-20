@@ -1,0 +1,10 @@
+POST https://ra.co/graphql HTTP/1.1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36
+Content-Type: application/json
+Cookie: __cf_bm=UVRNYi03RwFiO4YLcU7QdxkoHNuTHSkyOQXWiBlFt2s-1687287555-0-Ae89P/Uz9AY70+Ju23CHqtYDVbsNFOGZpqgR1vKvMwTBk8Q4qloEPPGFahjIgIxaX2DcSKhfLfXRd03oDWt2owM=
+Content-Length: 100
+
+{
+  "query": "{\n    artist(slug:\"boysnoize\") {\n        id\n        name\n    }\n}\n",
+  "variables": {}
+}
