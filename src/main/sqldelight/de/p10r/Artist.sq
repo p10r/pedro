@@ -5,11 +5,8 @@ CREATE TABLE stored_artists(
 
 create {
   INSERT INTO stored_artists (name)
-  VALUES (?);
-
-  SELECT *
-  FROM stored_artists
-  WHERE id = last_insert_rowid();
+  VALUES (?)
+  RETURNING id;
 }
 
 selectAll:

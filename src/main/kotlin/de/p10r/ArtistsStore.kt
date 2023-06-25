@@ -11,8 +11,10 @@ class ArtistsStore(database: Database) {
   fun findAll(): Result4k<List<Artist>, Exception> =
     resultFrom { sql.selectAll().executeAsList().toArtists() }
 
-  fun create(newArtist: NewArtist): Result<Artist, Exception> =
-    resultFrom { sql.create(newArtist.name).executeAsOne().toArtist() }
+  fun create(newArtist: NewArtist): Result<Artist, Exception> = resultFrom {
+    val id = sql.create(newArtist.name).executeAsOne()
+    Artist(ArtistId.of(id), newArtist.name)
+  }
 
   private fun Stored_artists.toArtist() = Artist(ArtistId.ofOrNull(id)!!, name)
 
