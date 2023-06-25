@@ -50,5 +50,6 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
   implementation("dev.forkhandles:result4k")
+  implementation("dev.forkhandles:values4k")
 }
 
