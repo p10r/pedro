@@ -9,6 +9,10 @@ data class Artist(
   val name: String,
 )
 
+data class NewArtist(
+  val name: String
+)
+
 class ArtistId private constructor(id: Long) : LongValue(id) {
   val id = "art-$id"
 
