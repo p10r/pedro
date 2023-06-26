@@ -5,7 +5,7 @@ import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.resultFrom
 import dev.forkhandles.values.ofOrNull
 
-class ArtistsStore(database: Database) {
+class ArtistRepository(database: Database) {
   private val sql = database.artistQueries
 
   fun findAll(): Result4k<List<Artist>, Exception> =

@@ -2,21 +2,25 @@ package de.p10r
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.values.ofOrNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-fun Database.Companion.new() = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).let {
+fun Database.Companion.new(
+  existingArtists: List<NewArtist> = emptyList()
+) = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).let {
   Schema.create(it)
   Database(it)
+}.also { db ->
+  existingArtists.forEach {
+    val id = db.artistQueries.create(it.name).executeAsOne()
+    println("Created $id ${it.name}")
+  }
 }
-
-fun ArtistId.Companion.unsafe(id: Long) = ofOrNull(id)!!
 
 
 class DatabaseTests {
   val db = Database.new()
-  val store = ArtistsStore(db)
+  val store = ArtistRepository(db)
   val sql = db.artistQueries
 
   @Test
