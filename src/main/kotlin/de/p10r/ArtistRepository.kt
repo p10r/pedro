@@ -11,6 +11,9 @@ class ArtistRepository(database: Database) {
   fun findAll(): Result4k<List<Artist>, Exception> =
     resultFrom { sql.selectAll().executeAsList().toArtists() }
 
+  fun findByName(name: String): Result<Artist?, Exception> =
+    resultFrom { sql.findByName(name).executeAsOneOrNull()?.toArtist() }
+
   fun create(newArtist: NewArtist): Result<Artist, Exception> = resultFrom {
     val id = sql.create(newArtist.name).executeAsOne()
     Artist(ArtistId.of(id), newArtist.name)

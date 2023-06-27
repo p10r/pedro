@@ -12,3 +12,8 @@ create {
 selectAll:
 SELECT *
 FROM stored_artists;
+
+findByName:
+SELECT *
+FROM stored_artists
+WHERE lower(name) = lower(?);
