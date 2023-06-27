@@ -1,4 +1,4 @@
-CREATE TABLE stored_artists(
+CREATE TABLE IF NOT EXISTS stored_artists(
   id INTEGER PRIMARY KEY NOT NULL,
   name TEXT NOT NULL
 );

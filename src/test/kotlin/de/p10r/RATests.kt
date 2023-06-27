@@ -13,7 +13,7 @@ import strikt.assertions.isEqualTo
 import java.time.LocalDate
 import java.time.Month
 
-abstract class ResidentAdvisorContract(
+abstract class RAContract(
   val uri: Uri,
   val client: HttpHandler,
 ) {
@@ -45,10 +45,9 @@ abstract class ResidentAdvisorContract(
 //These tests might get outdated because the queries are set to specific dates
 //Update the queries if needed
 @EnabledIfSystemProperty(named = "run-e2e", matches = "true")
-class ProdResidentAdvisorTests :
-  ResidentAdvisorContract(Uri.of("https://ra.co"), JavaHttpClient())
+class ProdRATests : RAContract(Uri.of("https://ra.co"), JavaHttpClient())
 
-class ResidentAdvisorTests : ResidentAdvisorContract(
+class RATests : RAContract(
   uri = Uri.of("http://resident-advisor"),
   client = FakeRAServer(
     mapOf(

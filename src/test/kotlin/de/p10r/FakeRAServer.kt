@@ -1,10 +1,12 @@
 package de.p10r
 
-import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.DebuggingFilters
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -12,16 +14,16 @@ import java.net.URL
 
 fun FakeRAServer(
   artistBySlugId: Map<RASlug, RAArtistResponse>
-): RoutingHttpHandler {
-  return routes(
-    "/graphql" bind Method.POST to { request ->
+): RoutingHttpHandler = DebuggingFilters.PrintRequest().then(
+  routes(
+    "/graphql" bind POST to { request ->
       if (request.isGetArtistRequest(artistBySlugId))
         getArtistResponse(artistBySlugId, request)
       else
         getEventsForArtistResponse()
     }
   )
-}
+)
 
 private fun Request.isGetArtistRequest(artistBySlugId: Map<RASlug, RAArtistResponse>): Boolean =
   artistBySlugId.keys.find { it.toGetArtistQuery() == bodyString() } != null
