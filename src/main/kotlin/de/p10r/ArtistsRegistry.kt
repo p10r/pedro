@@ -10,8 +10,8 @@ class ArtistsRegistry(
     repository.findAll().orThrow()
 
   fun add(inputUrl: InputUrl) { //TODO handle errors
-    val artist = raClient.getArtistBy(inputUrl.toRASlug())
-    if (repository.findByName(artist!!.name).orThrow() != null) return
+    val artist = raClient.getArtistBy(inputUrl.toRASlug()) ?: return
+    if (repository.findByName(artist.name).orThrow() != null) return
     repository.create(NewArtist(artist.name))
   }
 }

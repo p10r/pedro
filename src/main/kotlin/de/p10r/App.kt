@@ -13,6 +13,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.events.Events
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator
@@ -37,37 +38,55 @@ fun main() {
 fun ProdApp(): HttpHandler {
   val driver = JdbcSqliteDriver("jdbc:sqlite:src/main/resources/pedro-local.db")
   val db = Database(driver).apply { Schema.create(driver) }
-  val repository = ArtistRepository(db)
   val client = OkHttpClient.Builder()
     .followRedirects(true)
     .build()
     .let { OkHttp(it) }
-  val raClient = RAClient(Uri.of("https://ra.co"), client)
-  val artistsRegistry = ArtistsRegistry(repository, raClient)
 
-  return ServerFilters.CatchAll()
-    .then(App(artistsRegistry, HandlebarsTemplates().Caching("src/main/resources")))
+  return App(
+    database = db,
+    Uri.of("https://ra.co"),
+    client,
+    renderer = HandlebarsTemplates().Caching("src/main/resources"),
+    events = {}
+  )
 }
 
 private val inputUrl = FormField.string().required("url")
 private val idFrom = Body.webForm(Validator.Feedback, inputUrl).toLens()
 
 fun App(
-  artistsRegistry: ArtistsRegistry,
-  renderer: TemplateRenderer
-): HttpHandler = routes(
-  "/" bind GET to {
-    val view = IndexViewModel(artistsRegistry.list())
-    Response(OK).body(renderer(view))
-  },
-  "/artists" bind POST to { req ->
-    idFrom(req).let(inputUrl)
-      .let(InputUrl::ofOrNull)
-      ?.let {
-        artistsRegistry.add(it)
-        Response(Status.SEE_OTHER).header("Location", "/")
-      } ?: Response(Status.BAD_REQUEST)
-  }
-)
+  database: Database,
+  raUri: Uri,
+  raHttp: HttpHandler,
+  renderer: TemplateRenderer,
+  events: Events
+): HttpHandler {
+  val artistRepository = ArtistRepository(database)
+  val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
+  val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
 
-private fun Database.checkConnection() = artistQueries.selectAll()
+  return AppIncomingHttp(
+    events,
+    ServerFilters.CatchAll {
+      events(UncaughtExceptionEvent(it))
+      Response(Status.INTERNAL_SERVER_ERROR)
+    }.then(
+      routes(
+        "/" bind GET to {
+          val view = IndexViewModel(artistsRegistry.list())
+          Response(OK).body(renderer(view))
+        },
+        "/artists" bind POST to { req ->
+          idFrom(req).let(inputUrl)
+            .let(InputUrl::ofOrNull)
+            ?.let {
+              artistsRegistry.add(it)
+              Response(Status.SEE_OTHER).header("Location", "/")
+            } ?: Response(Status.BAD_REQUEST)
+        }
+      )
+    )
+  )
+}
+

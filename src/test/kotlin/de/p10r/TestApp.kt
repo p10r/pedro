@@ -3,6 +3,7 @@ package de.p10r
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.events.Events
 import org.http4k.filter.DebuggingFilters
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -30,13 +31,12 @@ fun TestApp(
         )
       )
     )
-  )
+  ),
+  events: Events = {}
 ): HttpHandler {
-  val raClient = RAClient(raUri, raServer)
-  val repository = ArtistRepository(Database.new(existingArtists))
-  val artistsRegistry = ArtistsRegistry(repository, raClient)
+  val db = Database.new(existingArtists)
   val renderer = HandlebarsTemplates().HotReload("src/main/resources")
 
   return DebuggingFilters.PrintRequest()
-    .then(App(artistsRegistry, renderer))
+    .then(App(db, raUri, raServer, renderer, events))
 }
