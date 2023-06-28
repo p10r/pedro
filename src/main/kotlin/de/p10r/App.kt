@@ -17,7 +17,6 @@ import org.http4k.events.Events
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator
-import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -52,7 +51,7 @@ fun ProdApp(): HttpHandler {
   )
 }
 
-private val inputUrl = FormField.string().required("url")
+private val inputUrl = FormField.map { InputUrl.ofOrNull(it) }.required("url")
 private val idFrom = Body.webForm(Validator.Feedback, inputUrl).toLens()
 
 fun App(
@@ -78,12 +77,10 @@ fun App(
           Response(OK).body(renderer(view))
         },
         "/artists" bind POST to { req ->
-          idFrom(req).let(inputUrl)
-            .let(InputUrl::ofOrNull)
-            ?.let {
-              artistsRegistry.add(it)
-              Response(Status.SEE_OTHER).header("Location", "/")
-            } ?: Response(Status.BAD_REQUEST)
+          idFrom(req).let(inputUrl)?.let {
+            artistsRegistry.add(it)
+            Response(Status.SEE_OTHER).header("Location", "/")
+          } ?: Response(Status.BAD_REQUEST)
         }
       )
     )
