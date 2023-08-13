@@ -2,6 +2,7 @@ package de.p10r
 
 import de.p10r.RAArtistResponse.RAData
 import de.p10r.RAEventsResponse.RADataWrapper.RAListing.RAEvent
+import de.p10r.fakes.RAServer
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
@@ -49,7 +50,7 @@ class ProdRATests : RAContract(Uri.of("https://ra.co"), JavaHttpClient())
 
 class RATests : RAContract(
   uri = Uri.of("http://resident-advisor"),
-  client = FakeRAServer(
+  client = RAServer(
     mapOf(
       RASlug("boysnoize") to RAArtistResponse(
         RAData(

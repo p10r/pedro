@@ -1,4 +1,4 @@
-package de.p10r
+package de.p10r.fakes
 
 import java.lang.reflect.Proxy
 

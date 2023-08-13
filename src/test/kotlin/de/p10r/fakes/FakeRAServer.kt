@@ -1,5 +1,9 @@
-package de.p10r
+package de.p10r.fakes
 
+import de.p10r.RAArtistResponse
+import de.p10r.RASlug
+import de.p10r.raArtistResponse
+import de.p10r.toGetArtistQuery
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,7 +16,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.net.URL
 
-fun FakeRAServer(
+fun RAServer(
   artistBySlugId: Map<RASlug, RAArtistResponse>
 ): RoutingHttpHandler = DebuggingFilters.PrintRequest().then(
   routes(

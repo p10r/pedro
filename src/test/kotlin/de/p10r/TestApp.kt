@@ -1,13 +1,12 @@
 package de.p10r
 
+import de.p10r.fakes.RAServer
+import de.p10r.fakes.new
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
-import org.http4k.core.then
 import org.http4k.events.Events
-import org.http4k.filter.DebuggingFilters
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.template.HandlebarsTemplates
 import kotlin.system.measureTimeMillis
 
 fun main() {
@@ -23,7 +22,7 @@ fun TestApp(
     NewArtist("Sinamin"),
   ),
   raUri: Uri = Uri.of("http://ra.co"),
-  raServer: HttpHandler = FakeRAServer(
+  raServer: HttpHandler = RAServer(
     mapOf(
       RASlug("boysnoize") to RAArtistResponse(
         RAArtistResponse.RAData(
@@ -35,8 +34,12 @@ fun TestApp(
   events: Events = {}
 ): HttpHandler {
   val db = Database.new(existingArtists)
-  val renderer = HandlebarsTemplates().HotReload("src/main/resources")
 
-  return DebuggingFilters.PrintRequest()
-    .then(App(db, raUri, raServer, renderer, events))
+  return App(
+    database = db,
+    raUri = raUri,
+    raHttp = raServer,
+    events = loggingEvents() then events,
+    features = Features(onlyPing = false)
+  )
 }

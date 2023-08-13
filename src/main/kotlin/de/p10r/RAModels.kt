@@ -2,6 +2,17 @@ package de.p10r
 
 data class RASlug(val value: String)
 
+/**
+ * Wrapper to represent:
+ * {
+ *     "data": {
+ *         "artist": {
+ *             "id": "943",
+ *             "name": "Boys Noize"
+ *         }
+ *     }
+ * }
+ */
 data class RAArtistResponse(val data: RAData) {
   data class RAData(val artist: RAArtist?)
 }

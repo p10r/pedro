@@ -44,12 +44,10 @@ dependencies {
   implementation("org.http4k:http4k-format-jackson")
   implementation("org.http4k:http4k-server-undertow")
   implementation("org.http4k:http4k-client-okhttp")
-  implementation("org.http4k:http4k-template-handlebars")
 
   testImplementation("org.http4k:http4k-testing-approval")
   testImplementation("org.http4k:http4k-testing-chaos")
   testImplementation("org.http4k:http4k-testing-strikt")
-  testImplementation("org.http4k:http4k-testing-webdriver")
   testImplementation("org.http4k:http4k-testing-tracerbullet")
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

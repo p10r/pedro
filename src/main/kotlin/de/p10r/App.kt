@@ -22,8 +22,6 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.template.HandlebarsTemplates
-import org.http4k.template.TemplateRenderer
 import kotlin.system.measureTimeMillis
 
 
@@ -46,8 +44,8 @@ fun ProdApp(): HttpHandler {
     database = db,
     Uri.of("https://ra.co"),
     client,
-    renderer = HandlebarsTemplates().Caching("src/main/resources"),
-    events = {}
+    events = {},
+    Features(onlyPing = true)
   )
 }
 
@@ -58,8 +56,8 @@ fun App(
   database: Database,
   raUri: Uri,
   raHttp: HttpHandler,
-  renderer: TemplateRenderer,
-  events: Events
+  events: Events,
+  features: Features
 ): HttpHandler {
   val artistRepository = ArtistRepository(database)
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
@@ -68,22 +66,20 @@ fun App(
   return AppIncomingHttp(
     events,
     ServerFilters.CatchAll {
+      println(it)
       events(UncaughtExceptionEvent(it))
       Response(Status.INTERNAL_SERVER_ERROR)
-    }.then(
-      routes(
-        "/" bind GET to {
-          val view = IndexViewModel(artistsRegistry.list())
-          Response(OK).body(renderer(view))
-        },
-        "/artists" bind POST to { req ->
-          idFrom(req).let(inputUrl)?.let {
-            artistsRegistry.add(it)
-            Response(Status.SEE_OTHER).header("Location", "/")
-          } ?: Response(Status.BAD_REQUEST)
-        }
-      )
-    )
+    }.then(AppRoutes(artistsRegistry))
   )
 }
+
+private fun AppRoutes(artistsRegistry: ArtistsRegistry) = routes(
+  "/artists" bind POST to { req ->
+    idFrom(req).let(inputUrl)?.let {
+      artistsRegistry.add(it)
+      Response(Status.SEE_OTHER).header("Location", "/")
+    } ?: Response(Status.BAD_REQUEST)
+  },
+  "/ping" bind GET to { Response(OK).body("pong") }
+)
 
