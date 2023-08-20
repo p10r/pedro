@@ -1,6 +1,10 @@
 package de.p10r
 
 import de.p10r.fakes.new
+import de.p10r.ra.RAArtist
+import de.p10r.ra.RAArtistResponse
+import de.p10r.ra.RAClient
+import de.p10r.ra.raArtistResponse
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status

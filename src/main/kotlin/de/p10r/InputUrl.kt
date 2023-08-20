@@ -1,5 +1,7 @@
 package de.p10r
 
+import de.p10r.ra.RASlug
+
 data class InputUrl private constructor(val value: String) {
   companion object {
     fun ofOrNull(value: String) =

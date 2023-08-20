@@ -1,0 +1,68 @@
+{
+  "update_id": 970580114,
+  "message": {
+    "message_id": 12,
+    "from": {
+      "id": 1,
+      "is_bot": false,
+      "first_name": "Philipp",
+      "username": "yourname",
+      "language_code": "en"
+    },
+    "chat": {
+      "id": 1,
+      "first_name": "Philipp",
+      "username": "yourname",
+      "type": "private"
+    },
+    "date": 1691939566,
+    "text": "hallo"
+  }
+}
+//called an add command
+{
+  "update_id": 970580115,
+  "message": {
+    "message_id": 13,
+    "from": {
+      "id": 1,
+      "is_bot": false,
+      "first_name": "Philipp",
+      "username": "yourname",
+      "language_code": "en"
+    },
+    "chat": {
+      "id": 1,
+      "first_name": "Philipp",
+      "username": "yourname",
+      "type": "private"
+    },
+    "date": 1691939664,
+    "text": "/add https://ra.co/dj/boysnoize",
+    "entities": [
+      {
+        "offset": 0,
+        "length": 4,
+        "type": "bot_command"
+        //TODO we can filter by that!
+      },
+      {
+        "offset": 5,
+        "length": 26,
+        "type": "url"
+      }
+    ]
+  }
+}
+//POST / HTTP/1.1
+//Accept-encoding: gzip, deflate
+//Host: something.ngrok-free.app
+//Content-type: application/json
+//Content-length: 398
+//x-b3-traceid: 95906f59b5c85a47
+//x-b3-spanid: 66d0f8e4b19ae938
+//x-b3-sampled: 1
+//
+//{JSON stuff here}
+//***** RESPONSE 200 to POST: / *****
+//HTTP/1.1 200 OK

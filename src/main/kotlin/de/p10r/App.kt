@@ -2,6 +2,7 @@ package de.p10r
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import de.p10r.Database.Companion.Schema
+import de.p10r.ra.RAClient
 import okhttp3.OkHttpClient
 import org.http4k.client.OkHttp
 import org.http4k.core.Body

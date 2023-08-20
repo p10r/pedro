@@ -1,5 +1,6 @@
 package de.p10r
 
+import de.p10r.ra.RAClient
 import dev.forkhandles.result4k.orThrow
 
 class ArtistsRegistry(

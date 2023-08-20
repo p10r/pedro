@@ -1,8 +1,12 @@
 package de.p10r
 
-import de.p10r.RAArtistResponse.RAData
-import de.p10r.RAEventsResponse.RADataWrapper.RAListing.RAEvent
 import de.p10r.fakes.RAServer
+import de.p10r.ra.RAArtist
+import de.p10r.ra.RAArtistResponse
+import de.p10r.ra.RAArtistResponse.RAData
+import de.p10r.ra.RAClient
+import de.p10r.ra.RAEventsResponse.RADataWrapper.RAListing.RAEvent
+import de.p10r.ra.RASlug
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri

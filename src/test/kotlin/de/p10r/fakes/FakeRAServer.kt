@@ -1,9 +1,9 @@
 package de.p10r.fakes
 
-import de.p10r.RAArtistResponse
-import de.p10r.RASlug
-import de.p10r.raArtistResponse
-import de.p10r.toGetArtistQuery
+import de.p10r.ra.RAArtistResponse
+import de.p10r.ra.RASlug
+import de.p10r.ra.raArtistResponse
+import de.p10r.ra.toGetArtistQuery
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
