@@ -1,5 +1,6 @@
 package de.p10r
 
+import de.p10r.fixtures.TestApp
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST

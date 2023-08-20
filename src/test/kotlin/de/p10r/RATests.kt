@@ -1,6 +1,6 @@
 package de.p10r
 
-import de.p10r.fakes.RAServer
+import de.p10r.fixtures.RAServer
 import de.p10r.ra.RAArtist
 import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RAArtistResponse.RAData

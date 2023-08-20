@@ -1,6 +1,6 @@
 package de.p10r
 
-import de.p10r.fakes.new
+import de.p10r.fixtures.new
 import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

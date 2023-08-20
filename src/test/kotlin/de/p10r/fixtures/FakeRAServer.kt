@@ -1,4 +1,4 @@
-package de.p10r.fakes
+package de.p10r.fixtures
 
 import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RASlug

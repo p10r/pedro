@@ -1,10 +1,14 @@
-package de.p10r
+package de.p10r.fixtures
 
-import de.p10r.fakes.RAServer
-import de.p10r.fakes.new
+import de.p10r.App
+import de.p10r.Database
+import de.p10r.Features
+import de.p10r.NewArtist
+import de.p10r.loggingEvents
 import de.p10r.ra.RAArtist
 import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RASlug
+import de.p10r.then
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.events.Events

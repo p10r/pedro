@@ -1,4 +1,4 @@
-package de.p10r.fakes
+package de.p10r.fixtures
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import de.p10r.Database
