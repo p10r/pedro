@@ -1,8 +1,12 @@
 package de.p10r.telegram
 
+import de.p10r.UserId
+
 data class IncomingTelegramRequest(
   val message: Message
 ) {
+  val userId = UserId(message.from.id)
+
   data class Message(
     val from: From,
     val text: String,

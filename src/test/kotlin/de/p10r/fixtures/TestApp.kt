@@ -4,14 +4,16 @@ import de.p10r.App
 import de.p10r.Database
 import de.p10r.Features
 import de.p10r.NewArtist
-import de.p10r.TelegramSecret
 import de.p10r.UserId
 import de.p10r.loggingEvents
 import de.p10r.ra.RAArtist
 import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RASlug
+import de.p10r.telegram.TelegramConfig
 import de.p10r.then
 import org.http4k.core.HttpHandler
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.events.Events
 import org.http4k.server.SunHttp
@@ -40,7 +42,13 @@ fun TestApp(
       )
     )
   ),
-  secret: TelegramSecret = TelegramSecret("secret"),
+  telegramUri: Uri = Uri.of("http://api.telegram.org"),
+  telegramConfig: TelegramConfig = TelegramConfig(
+    TelegramConfig.BotId("botId"),
+    TelegramConfig.BotSecret("bot-s3cret"),
+    TelegramConfig.TelegramSecret("s3cret"),
+  ),
+  telegramServer: HttpHandler = { Response(Status.OK) },
   users: List<UserId> = listOf(UserId(1)),
   events: Events = {},
   db: Database = Database.new(existingArtists)
@@ -51,8 +59,10 @@ fun TestApp(
     raUri = raUri,
     raHttp = raServer,
     events = loggingEvents() then events,
-    secret,
-    users,
+    telegramUri = telegramUri,
+    telegramHttp = telegramServer,
+    telegramConfig = telegramConfig,
     features = Features(onlyPing = false),
+    users = users,
   )
 }

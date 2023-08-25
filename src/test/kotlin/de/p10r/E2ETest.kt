@@ -1,34 +1,48 @@
 package de.p10r
 
 import de.p10r.fixtures.TestApp
+import de.p10r.telegram.FakeTelegramServer
+import de.p10r.telegram.TelegramConfig
+import de.p10r.telegram.TelegramConfig.BotId
+import de.p10r.telegram.TelegramConfig.BotSecret
+import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
+import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegram.TelegramMessage
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
-import strikt.assertions.isNotEmpty
 
-@Disabled
 class E2ETest {
+  val validUserId = UserId(444)
+  val config = TelegramConfig(
+    botId = BotId("123"),
+    botSecret = BotSecret("456"),
+    secret = TelegramSecret("s3cr3t")
+  )
+
+  val chats = mapOf<UserId, MutableList<TelegramMessage>>(
+    UserId(1) to mutableListOf(),
+    validUserId to mutableListOf(),
+  )
+
+  val telegramServer = FakeTelegramServer(config, chats)
+
+  val app = TestApp(
+    existingArtists = emptyList(),
+    users = listOf(validUserId),
+    telegramServer = telegramServer,
+    telegramConfig = config
+  )
+
   @Test
-  fun `adds an artist send via Telegram`() {
-    val validUserId = 444
-
-    val secret = TelegramSecret("s3cr3t")
-    val app = TestApp(
-      existingArtists = emptyList(),
-      users = listOf(UserId(validUserId)),
-      secret = secret
-    )
-
-    val req = Request(Method.POST, "/telegram")
-      .header(TELEGRAM_SECRET_HEADER, secret.value)
+  fun `echoes message`() {
+    val req = Request(POST, "/telegram")
+      .header(TELEGRAM_SECRET_HEADER, config.secret.value)
       .body(
         """
       {
@@ -43,13 +57,13 @@ class E2ETest {
             "language_code": "en"
           },
           "chat": {
-            "id": $validUserId,
+            "id": ${validUserId.value},
             "first_name": "Philipp",
             "username": "yourname",
             "type": "private"
           },
           "date": 1691939664,
-          "text": "/add https://ra.co/dj/sabura",
+          "text": "/add sabura",
           "entities": [
             {
               "offset": 0,
@@ -67,19 +81,13 @@ class E2ETest {
     """.trimIndent()
       )
 
-    val receivedTelegramMessages = mutableListOf<String>()
-    val telegramServer = { req: Request ->
-      receivedTelegramMessages.add(req.bodyString())
-      Response(OK)
-    }
-
-    expectThat(app.getAllArtists()).isEmpty()
+//    expectThat(app.getAllArtists()).isEmpty()
 
     val postMessageRes = app(req)
 
     expectThat(postMessageRes.status).isEqualTo(OK)
-    expectThat(app.getAllArtists()).isNotEmpty()
-    expectThat(receivedTelegramMessages).isNotEmpty()
+//    expectThat(app.getAllArtists()).isNotEmpty()
+    expectThat(chats[validUserId]).isEqualTo(mutableListOf(TelegramMessage("/add sabura")))
   }
 
   private fun HttpHandler.getAllArtists() = this(Request(GET, "/artists")).let(artists)

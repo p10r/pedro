@@ -6,6 +6,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.events.Event
 import org.http4k.events.Events
@@ -23,6 +24,7 @@ val messageLens =
   Query.string().map(::TelegramMessage, TelegramMessage::value).required("text")
 
 class TelegramClient(
+  private val uri: Uri,
   private val http: HttpHandler,
   private val config: TelegramConfig,
   private val events: Events

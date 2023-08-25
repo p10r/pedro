@@ -3,11 +3,13 @@ package de.p10r.telegram
 import de.p10r.UserId
 import de.p10r.telegram.TelegramConfig.BotId
 import de.p10r.telegram.TelegramConfig.BotSecret
+import de.p10r.telegram.TelegramConfig.TelegramSecret
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.events.Event
 import org.http4k.filter.ServerFilters
@@ -23,9 +25,10 @@ import strikt.assertions.isEqualTo
 class TelegramClientTest {
   val config = TelegramConfig(
     botId = BotId("123"),
-    botSecret = BotSecret("456")
+    botSecret = BotSecret("456"),
+    secret = TelegramSecret("secret")
   )
-
+  val uri = Uri.of("http://telegram")
   val events = mutableListOf<Event>()
 
   @Test
@@ -35,7 +38,7 @@ class TelegramClientTest {
       UserId(2) to mutableListOf(),
     )
     val telegram = FakeTelegramServer(config, chats)
-    val client = TelegramClient(telegram, config, events::add)
+    val client = TelegramClient(uri, telegram, config, events::add)
     val userId = UserId(2)
 
     val res = client.sendMessage(TelegramMessage("hello there"), userId)
@@ -47,7 +50,7 @@ class TelegramClientTest {
   @Test
   fun `handles and monitors error`() {
     val error = { _: Request -> chatNotFoundError }
-    val client = TelegramClient(error, config, events::add)
+    val client = TelegramClient(uri, error, config, events::add)
 
     val response = client.sendMessage(TelegramMessage("hi"), UserId(666))
 
@@ -61,8 +64,11 @@ class TelegramClientTest {
     val error = { _: Request -> chatNotFoundError }
     val success = { _: Request -> Response(OK) }
 
-    TelegramClient(error, config, events::add).sendMessage(TelegramMessage("hi"), UserId(666))
-    TelegramClient(success, config, events::add).sendMessage(
+    TelegramClient(uri, error, config, events::add).sendMessage(
+      TelegramMessage("hi"),
+      UserId(666)
+    )
+    TelegramClient(uri, success, config, events::add).sendMessage(
       TelegramMessage("hi"),
       UserId(666)
     )

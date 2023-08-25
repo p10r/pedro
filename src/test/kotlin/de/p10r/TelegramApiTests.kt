@@ -2,6 +2,8 @@ package de.p10r
 
 import de.p10r.telegram.IncomingTelegramRequest
 import de.p10r.telegram.IncomingTelegramRequest.Message
+import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
+import de.p10r.telegram.TelegramConfig.TelegramSecret
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -22,7 +24,7 @@ class TelegramApiTests {
     val req = Request(POST, "/").body(readTextFrom("incoming-telegram-request.json"))
       .header("ContentType", ContentType.APPLICATION_JSON.toHeaderValue())
 
-    expectThat(telegramMessage(req)).isA<IncomingTelegramRequest>()
+    expectThat(telegramCommand(req)).isA<IncomingTelegramRequest>()
   }
 
   @Test
@@ -73,7 +75,7 @@ fun HttpHandler.postTelegramMessage(
 ) = Request(POST, "/telegram")
   .header(header.first, header.second)
   .with(
-    telegramMessage of IncomingTelegramRequest(
+    telegramCommand of IncomingTelegramRequest(
       Message(
         from,
         text = "/add my_fav_artist",

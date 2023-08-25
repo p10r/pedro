@@ -4,6 +4,11 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import de.p10r.Database.Companion.Schema
 import de.p10r.ra.RAClient
 import de.p10r.telegram.IncomingTelegramRequest
+import de.p10r.telegram.TelegramClient
+import de.p10r.telegram.TelegramConfig
+import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
+import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegram.TelegramMessage
 import okhttp3.OkHttpClient
 import org.http4k.client.OkHttp
 import org.http4k.core.Body
@@ -48,23 +53,24 @@ fun ProdApp(): HttpHandler {
     .build()
     .let { OkHttp(it) }
 
-  return App(
-    database = db,
-    Uri.of("https://ra.co"),
-    client,
-    events = {},
-    TelegramSecret("secret"), //TODO
-    listOf(UserId(1234)), //TODO
-    Features(onlyPing = true),
-  )
+  return TODO()
+//  return App(
+//    database = db,
+//    Uri.of("https://ra.co"),
+//    client,
+//    events = {},
+//    telegramUri = Uri.of("https://api.telegram.org/"),
+//    TelegramSecret("secret"), //TODO
+//    listOf(UserId(1234)), //TODO
+//    Features(onlyPing = true),
+//  )
 }
 
 private val inputUrl = FormField.map { InputUrl.ofOrNull(it) }.required("url")
 private val idFrom = Body.webForm(Validator.Feedback, inputUrl).toLens()
 val artists = Body.auto<List<Artist>>().toLens()
-val telegramMessage = Body.auto<IncomingTelegramRequest>().toLens()
+val telegramCommand = Body.auto<IncomingTelegramRequest>().toLens()
 
-data class TelegramSecret(val value: String)
 data class UserId(val value: Int)
 
 fun App(
@@ -72,20 +78,26 @@ fun App(
   raUri: Uri,
   raHttp: HttpHandler,
   events: Events,
-  secret: TelegramSecret,
+  telegramUri: Uri,
+  telegramHttp: HttpHandler,
+  telegramConfig: TelegramConfig,
   users: List<UserId>,
   features: Features,
 ): HttpHandler {
   val artistRepository = ArtistRepository(database)
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
+  //TODO remove events as last parameter
+  val telegramClient =
+    TelegramClient(telegramUri, AppOutgoingHttp(events, telegramHttp), telegramConfig, events)
+
 
   return AppIncomingHttp(
     events,
     ServerFilters.CatchAll {
       events(UncaughtExceptionEvent(it))
       Response(Status.INTERNAL_SERVER_ERROR)
-    }.then(AppRoutes(artistsRegistry, secret, users))
+    }.then(AppRoutes(artistsRegistry, telegramConfig.secret, users, telegramClient))
   )
 }
 
@@ -93,6 +105,7 @@ private fun AppRoutes(
   artistsRegistry: ArtistsRegistry,
   secret: TelegramSecret,
   users: List<UserId>,
+  telegramClient: TelegramClient,
 ) = routes(
   "/artists" bind POST to { req ->
     idFrom(req).let(inputUrl)?.let {
@@ -105,11 +118,14 @@ private fun AppRoutes(
   },
   "/ping" bind GET to { Response(OK).body("pong") },
   "/telegram" bind POST to TelegramSecurityFilter(users, secret).then { req ->
-    val msg = telegramMessage(req)
+    val msg = telegramCommand(req)
 
     when {
       msg.message.entities.none { it.type == "bot_command" } -> Response(BAD_REQUEST)
-      else                                                   -> Response(OK)
+      else                                                   -> {
+        telegramClient.sendMessage(TelegramMessage(msg.message.text), msg.userId)
+        Response(OK)
+      }
     }
   }
 )
@@ -119,7 +135,7 @@ fun TelegramSecurityFilter(
   secret: TelegramSecret
 ) = Filter { next ->
   { req ->
-    val payload = telegramMessage(req).message
+    val payload = telegramCommand(req).message
 
     when {
       !req.has(secret)                                   -> Response(UNAUTHORIZED)
@@ -130,7 +146,7 @@ fun TelegramSecurityFilter(
   }
 }
 
-const val TELEGRAM_SECRET_HEADER = "X-Telegram-Bot-Api-Secret-Token"
+// TODO use header lens
 private fun Request.has(secret: TelegramSecret) =
   header(TELEGRAM_SECRET_HEADER) != null
     && header(TELEGRAM_SECRET_HEADER) == secret.value
