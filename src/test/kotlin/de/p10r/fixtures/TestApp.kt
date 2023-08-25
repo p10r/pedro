@@ -4,6 +4,8 @@ import de.p10r.App
 import de.p10r.Database
 import de.p10r.Features
 import de.p10r.NewArtist
+import de.p10r.TelegramSecret
+import de.p10r.UserId
 import de.p10r.loggingEvents
 import de.p10r.ra.RAArtist
 import de.p10r.ra.RAArtistResponse
@@ -38,15 +40,19 @@ fun TestApp(
       )
     )
   ),
-  events: Events = {}
+  secret: TelegramSecret = TelegramSecret("secret"),
+  users: List<UserId> = listOf(UserId(1)),
+  events: Events = {},
+  db: Database = Database.new(existingArtists)
 ): HttpHandler {
-  val db = Database.new(existingArtists)
 
   return App(
     database = db,
     raUri = raUri,
     raHttp = raServer,
     events = loggingEvents() then events,
-    features = Features(onlyPing = false)
+    secret,
+    users,
+    features = Features(onlyPing = false),
   )
 }

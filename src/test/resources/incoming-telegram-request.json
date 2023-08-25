@@ -1,0 +1,33 @@
+{
+  "update_id": 970580115,
+  "message": {
+    "message_id": 13,
+    "from": {
+      "id": 1,
+      "is_bot": false,
+      "first_name": "Philipp",
+      "username": "yourname",
+      "language_code": "en"
+    },
+    "chat": {
+      "id": 1,
+      "first_name": "Philipp",
+      "username": "yourname",
+      "type": "private"
+    },
+    "date": 1691939664,
+    "text": "/add https://ra.co/dj/sabura",
+    "entities": [
+      {
+        "offset": 0,
+        "length": 4,
+        "type": "bot_command"
+      },
+      {
+        "offset": 5,
+        "length": 26,
+        "type": "url"
+      }
+    ]
+  }
+}

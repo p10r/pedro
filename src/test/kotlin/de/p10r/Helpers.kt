@@ -7,3 +7,6 @@ fun InputUrl.Companion.unsafe(value: String) = ofOrNull(value)!!
 
 fun List<Artist>.toNewArtists() = map { it.toNewArtist() }
 fun Artist.toNewArtist() = NewArtist(name)
+
+fun readTextFrom(path: String) = {}::class.java.classLoader.getResource(path)!!.readText()
+
