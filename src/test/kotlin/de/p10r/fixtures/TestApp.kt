@@ -12,6 +12,7 @@ import de.p10r.ra.RASlug
 import de.p10r.telegram.TelegramConfig
 import de.p10r.then
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
@@ -42,13 +43,14 @@ fun TestApp(
       )
     )
   ),
-  telegramUri: Uri = Uri.of("http://api.telegram.org"),
-  telegramConfig: TelegramConfig = TelegramConfig(
-    TelegramConfig.BotId("botId"),
-    TelegramConfig.BotSecret("bot-s3cret"),
-    TelegramConfig.TelegramSecret("s3cret"),
+  telegramConfig: TelegramConfig = TelegramConfig.of(
+    botId = TelegramConfig.BotId("123"),
+    botSecret = TelegramConfig.BotSecret("456"),
+    secret = TelegramConfig.TelegramSecret("secret"),
+    events = {},
+    outgoingHttp = { req: Request -> Response(Status.OK) },
+    uri = Uri.of("http://localtelegram")
   ),
-  telegramServer: HttpHandler = { Response(Status.OK) },
   users: List<UserId> = listOf(UserId(1)),
   events: Events = {},
   db: Database = Database.new(existingArtists)
@@ -59,8 +61,6 @@ fun TestApp(
     raUri = raUri,
     raHttp = raServer,
     events = loggingEvents() then events,
-    telegramUri = telegramUri,
-    telegramHttp = telegramServer,
     telegramConfig = telegramConfig,
     features = Features(onlyPing = false),
     users = users,

@@ -2,11 +2,9 @@ package de.p10r.telegram
 
 import de.p10r.UserId
 import org.http4k.core.Body
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.events.Event
 import org.http4k.events.Events
@@ -18,22 +16,21 @@ import org.http4k.lens.string
 
 val chatIdLens: BiDiLens<Request, UserId> =
   Query.int().map(::UserId, UserId::value).required("chat_id")
+
 val errorLens =
   Body.auto<TelegramError>().toLens()
+
 val messageLens =
   Query.string().map(::TelegramMessage, TelegramMessage::value).required("text")
 
 class TelegramClient(
-  private val uri: Uri,
-  private val http: HttpHandler,
   private val config: TelegramConfig,
   private val events: Events
 ) {
   fun sendMessage(message: TelegramMessage, userId: UserId): Response {
     val req = Request(POST, "/bot${config.botId}:${config.botSecret}/sendMessage")
       .with(chatIdLens of userId, messageLens of message)
-
-    val res = http(req)
+    val res = config.outgoingHttp(req)
 
     if (res.status.successful) {
       events(OutgoingTelegramMessage(message, userId))
@@ -41,7 +38,6 @@ class TelegramClient(
     }
 
     events(OutgoingTelegramMessageError(req, res))
-
     return Response(res.status)
       .body(errorLens(res).description)
   }

@@ -6,6 +6,8 @@ import de.p10r.ra.RAClient
 import de.p10r.telegram.IncomingTelegramRequest
 import de.p10r.telegram.TelegramClient
 import de.p10r.telegram.TelegramConfig
+import de.p10r.telegram.TelegramConfig.BotId
+import de.p10r.telegram.TelegramConfig.BotSecret
 import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
 import de.p10r.telegram.TelegramConfig.TelegramSecret
 import de.p10r.telegram.TelegramMessage
@@ -53,17 +55,25 @@ fun ProdApp(): HttpHandler {
     .build()
     .let { OkHttp(it) }
 
-  return TODO()
-//  return App(
-//    database = db,
-//    Uri.of("https://ra.co"),
-//    client,
-//    events = {},
-//    telegramUri = Uri.of("https://api.telegram.org/"),
-//    TelegramSecret("secret"), //TODO
-//    listOf(UserId(1234)), //TODO
-//    Features(onlyPing = true),
-//  )
+  val events: Events = {}
+  val telegramConfig = TelegramConfig.of(
+    uri = Uri.of("https://api.telegram.org"),
+    outgoingHttp = client,
+    botId = BotId(""), // TODO
+    botSecret = BotSecret(""),// TODO
+    secret = TelegramSecret(""), // TODO
+    events = events
+  )
+
+  return App(
+    database = db,
+    raUri = Uri.of("https://ra.co"),
+    raHttp = client,
+    events = {}, // TODO
+    telegramConfig = telegramConfig,
+    users = listOf(UserId(1234)), // TODO
+    features = Features()
+  )
 }
 
 private val inputUrl = FormField.map { InputUrl.ofOrNull(it) }.required("url")
@@ -78,18 +88,15 @@ fun App(
   raUri: Uri,
   raHttp: HttpHandler,
   events: Events,
-  telegramUri: Uri,
-  telegramHttp: HttpHandler,
   telegramConfig: TelegramConfig,
   users: List<UserId>,
-  features: Features,
+  @Suppress("UNUSED_PARAMETER") features: Features,
 ): HttpHandler {
   val artistRepository = ArtistRepository(database)
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
   //TODO remove events as last parameter
-  val telegramClient =
-    TelegramClient(telegramUri, AppOutgoingHttp(events, telegramHttp), telegramConfig, events)
+  val telegramClient = TelegramClient(telegramConfig, events)
 
 
   return AppIncomingHttp(

@@ -13,29 +13,33 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
 class E2ETest {
   val validUserId = UserId(444)
-  val config = TelegramConfig(
-    botId = BotId("123"),
-    botSecret = BotSecret("456"),
-    secret = TelegramSecret("s3cr3t")
-  )
-
+  val botId = BotId("123")
+  val botSecret = BotSecret("456")
   val chats = mapOf<UserId, MutableList<TelegramMessage>>(
     UserId(1) to mutableListOf(),
     validUserId to mutableListOf(),
   )
 
-  val telegramServer = FakeTelegramServer(config, chats)
+  val telegramServer = FakeTelegramServer(botId, botSecret, chats)
+  val config = TelegramConfig.of(
+    botId = botId,
+    botSecret = botSecret,
+    secret = TelegramSecret("secret"),
+    events = {},
+    outgoingHttp = telegramServer,
+    uri = Uri.of("http://localtelegram")
+  )
 
   val app = TestApp(
     existingArtists = emptyList(),
     users = listOf(validUserId),
-    telegramServer = telegramServer,
     telegramConfig = config
   )
 

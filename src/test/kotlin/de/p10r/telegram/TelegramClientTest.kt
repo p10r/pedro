@@ -23,12 +23,14 @@ import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 
 class TelegramClientTest {
-  val config = TelegramConfig(
+  val config = TelegramConfig.of(
     botId = BotId("123"),
     botSecret = BotSecret("456"),
-    secret = TelegramSecret("secret")
+    secret = TelegramSecret("secret"),
+    events = {},
+    outgoingHttp = { _: Request -> Response(OK) },
+    uri = Uri.of("http://localtelegram")
   )
-  val uri = Uri.of("http://telegram")
   val events = mutableListOf<Event>()
 
   @Test
@@ -37,8 +39,8 @@ class TelegramClientTest {
       UserId(1) to mutableListOf(),
       UserId(2) to mutableListOf(),
     )
-    val telegram = FakeTelegramServer(config, chats)
-    val client = TelegramClient(uri, telegram, config, events::add)
+    val telegram = FakeTelegramServer(config.botId, config.botSecret, chats)
+    val client = TelegramClient(config.copy(outgoingHttp = telegram), events::add)
     val userId = UserId(2)
 
     val res = client.sendMessage(TelegramMessage("hello there"), userId)
@@ -48,34 +50,15 @@ class TelegramClientTest {
   }
 
   @Test
-  fun `handles and monitors error`() {
+  fun `handles error`() {
     val error = { _: Request -> chatNotFoundError }
-    val client = TelegramClient(uri, error, config, events::add)
+    val client = TelegramClient(config.copy(outgoingHttp = error), events::add)
 
     val response = client.sendMessage(TelegramMessage("hi"), UserId(666))
 
     expectThat(response).isEqualTo(Response(BAD_REQUEST).body("Bad Request: chat not found"))
     expectThat(events).hasSize(1)
     expectThat(events.first()).isA<OutgoingTelegramMessageError>()
-  }
-
-  @Test
-  fun `monitoring works`() {
-    val error = { _: Request -> chatNotFoundError }
-    val success = { _: Request -> Response(OK) }
-
-    TelegramClient(uri, error, config, events::add).sendMessage(
-      TelegramMessage("hi"),
-      UserId(666)
-    )
-    TelegramClient(uri, success, config, events::add).sendMessage(
-      TelegramMessage("hi"),
-      UserId(666)
-    )
-
-    expectThat(events).hasSize(2)
-    expectThat(events.first()).isA<OutgoingTelegramMessageError>()
-    expectThat(events.last()).isA<OutgoingTelegramMessage>()
   }
 }
 
@@ -88,11 +71,12 @@ val chatNotFoundError = Response(BAD_REQUEST).body(
 )
 
 fun FakeTelegramServer(
-  config: TelegramConfig,
+  botId: BotId,
+  botSecret: BotSecret,
   userChats: Map<UserId, MutableList<TelegramMessage>>
 ): RoutingHttpHandler {
   return ServerFilters.CatchLensFailure.then(
-    routes("/bot${config.botId}:${config.botSecret}/sendMessage" bind POST to { req: Request ->
+    routes("/bot$botId:$botSecret/sendMessage" bind POST to { req: Request ->
       val userId = chatIdLens(req)
       val message = messageLens(req)
       userChats[userId]
