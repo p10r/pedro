@@ -1,9 +1,12 @@
-package de.p10r
+package de.p10r.telegram
 
-import de.p10r.telegram.IncomingTelegramRequest
+import de.p10r.TelegramSecurityFilter
+import de.p10r.UserId
+import de.p10r.readTextFrom
 import de.p10r.telegram.IncomingTelegramRequest.Message
 import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
 import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegramCommand
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
