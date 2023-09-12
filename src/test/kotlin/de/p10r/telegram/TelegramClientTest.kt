@@ -3,7 +3,7 @@ package de.p10r.telegram
 import de.p10r.UserId
 import de.p10r.telegram.TelegramConfig.BotId
 import de.p10r.telegram.TelegramConfig.BotSecret
-import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -26,7 +26,7 @@ class TelegramClientTest {
   val config = TelegramConfig.of(
     botId = BotId("123"),
     botSecret = BotSecret("456"),
-    secret = TelegramSecret("secret"),
+    secret = IncomingTelegramRequestSecret("secret"),
     events = {},
     outgoingHttp = { _: Request -> Response(OK) },
     uri = Uri.of("http://localtelegram")

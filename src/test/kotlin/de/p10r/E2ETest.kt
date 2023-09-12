@@ -2,11 +2,12 @@ package de.p10r
 
 import de.p10r.fixtures.TestApp
 import de.p10r.telegram.FakeTelegramServer
+import de.p10r.telegram.IncomingTelegramRequest
 import de.p10r.telegram.TelegramConfig
 import de.p10r.telegram.TelegramConfig.BotId
 import de.p10r.telegram.TelegramConfig.BotSecret
 import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
-import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.telegram.TelegramMessage
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -14,8 +15,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.core.with
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 
 class E2ETest {
@@ -31,7 +34,7 @@ class E2ETest {
   val config = TelegramConfig.of(
     botId = botId,
     botSecret = botSecret,
-    secret = TelegramSecret("secret"),
+    secret = IncomingTelegramRequestSecret("secret"),
     events = {},
     outgoingHttp = telegramServer,
     uri = Uri.of("http://localtelegram")
@@ -47,51 +50,23 @@ class E2ETest {
   fun `echoes message`() {
     val req = Request(POST, "/telegram")
       .header(TELEGRAM_SECRET_HEADER, config.secret.value)
-      .body(
-        """
-      {
-        "update_id": 970580115,
-        "message": {
-          "message_id": 13,
-          "from": {
-            "id": 444,
-            "is_bot": false,
-            "first_name": "Philipp",
-            "username": "yourname",
-            "language_code": "en"
-          },
-          "chat": {
-            "id": ${validUserId.value},
-            "first_name": "Philipp",
-            "username": "yourname",
-            "type": "private"
-          },
-          "date": 1691939664,
-          "text": "/add sabura",
-          "entities": [
-            {
-              "offset": 0,
-              "length": 4,
-              "type": "bot_command"
-            },
-            {
-              "offset": 5,
-              "length": 26,
-              "type": "url"
-            }
-          ]
-        }
-      }
-    """.trimIndent()
+      .with(
+        telegramCommand of IncomingTelegramRequest(
+          IncomingTelegramRequest.Message(
+            IncomingTelegramRequest.Message.From(validUserId.value),
+            text = "/add https://ra.co/dj/sabura",
+            listOf(IncomingTelegramRequest.Message.Entity("bot_command"))
+          )
+        )
       )
-
-//    expectThat(app.getAllArtists()).isEmpty()
+    expectThat(app.getAllArtists()).isEmpty()
 
     val postMessageRes = app(req)
 
     expectThat(postMessageRes.status).isEqualTo(OK)
 //    expectThat(app.getAllArtists()).isNotEmpty()
-    expectThat(chats[validUserId]).isEqualTo(mutableListOf(TelegramMessage("/add sabura")))
+    expectThat(chats[validUserId])
+      .isEqualTo(mutableListOf(TelegramMessage("/add https://ra.co/dj/sabura")))
   }
 
   private fun HttpHandler.getAllArtists() = this(Request(GET, "/artists")).let(artists)

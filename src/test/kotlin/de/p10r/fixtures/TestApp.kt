@@ -2,15 +2,15 @@ package de.p10r.fixtures
 
 import de.p10r.App
 import de.p10r.Database
-import de.p10r.Features
 import de.p10r.NewArtist
 import de.p10r.UserId
-import de.p10r.loggingEvents
+import de.p10r.infrastructure.Features
+import de.p10r.infrastructure.loggingEvents
+import de.p10r.infrastructure.then
 import de.p10r.ra.RAArtist
 import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RASlug
 import de.p10r.telegram.TelegramConfig
-import de.p10r.then
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -46,7 +46,7 @@ fun TestApp(
   telegramConfig: TelegramConfig = TelegramConfig.of(
     botId = TelegramConfig.BotId("123"),
     botSecret = TelegramConfig.BotSecret("456"),
-    secret = TelegramConfig.TelegramSecret("secret"),
+    secret = TelegramConfig.IncomingTelegramRequestSecret("secret"),
     events = {},
     outgoingHttp = { req: Request -> Response(Status.OK) },
     uri = Uri.of("http://localtelegram")

@@ -1,4 +1,4 @@
-package de.p10r
+package de.p10r.infrastructure
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.HttpHandler
@@ -27,7 +27,6 @@ fun AppOutgoingHttp(events: Events, http: HttpHandler) =
     .then(ResponseFilters.ReportHttpTransaction { events(HttpEvent.Outgoing(it)) })
     .then(http)
 
-
 fun HandleError(events: Events) = ServerFilters.CatchAll {
   events(Error("uncaught!", it))
   Response(INTERNAL_SERVER_ERROR)
@@ -49,11 +48,19 @@ fun loggingEvents(
   objectMapper: ObjectMapper = Jackson.mapper,
   clock: () -> Instant = Instant::now
 ): Events = { event: Event ->
-  logger(objectMapper.writeValueAsString(LogMessage(clock(), event)))
+  logger(
+    objectMapper.writeValueAsString(
+      LogMessage(
+        timestamp = clock(),
+        event = event::class.simpleName ?: "Unknown Event",
+        data = event
+      )
+    )
+  )
 }
 
 @Suppress("unused")
-class LogMessage(val timestamp: Instant, val event: Event)
+class LogMessage(val timestamp: Instant, val event: String, val data: Event)
 
 infix fun Events.then(that: Events): Events = { event ->
   this(event)

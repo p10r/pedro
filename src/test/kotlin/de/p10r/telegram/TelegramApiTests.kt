@@ -5,7 +5,7 @@ import de.p10r.UserId
 import de.p10r.readTextFrom
 import de.p10r.telegram.IncomingTelegramRequest.Message
 import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
-import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.telegramCommand
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
@@ -32,7 +32,8 @@ class TelegramApiTests {
 
   @Test
   fun `accepts only bot command`() {
-    val filter = TelegramSecurityFilter(listOf(UserId(1)), TelegramSecret("secret"))
+    val filter =
+      TelegramSecurityFilter(listOf(UserId(1)), IncomingTelegramRequestSecret("secret"))
     val app = filter { Response(OK) }
 
     expectThat(app.postTelegramMessage(Message.Entity("bot_command"), Message.From(1)))
@@ -44,7 +45,8 @@ class TelegramApiTests {
 
   @Test
   fun `returns 401 if user is not eligible for bot`() {
-    val filter = TelegramSecurityFilter(listOf(UserId(111)), TelegramSecret("secret"))
+    val filter =
+      TelegramSecurityFilter(listOf(UserId(111)), IncomingTelegramRequestSecret("secret"))
     val app = filter { Response(OK) }
 
     expectThat(app.postTelegramMessage(from = Message.From(111)))
@@ -57,7 +59,8 @@ class TelegramApiTests {
 
   @Test
   fun `accepts only request with correct secret_token header`() {
-    val filter = TelegramSecurityFilter(listOf(UserId(1)), TelegramSecret("s3cr3t"))
+    val filter =
+      TelegramSecurityFilter(listOf(UserId(1)), IncomingTelegramRequestSecret("s3cr3t"))
     val app = filter { Response(OK) }
 
     expectThat(

@@ -1,18 +1,16 @@
 package de.p10r
 
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import de.p10r.Database.Companion.Schema
+import de.p10r.infrastructure.AppIncomingHttp
+import de.p10r.infrastructure.AppOutgoingHttp
+import de.p10r.infrastructure.Features
+import de.p10r.infrastructure.UncaughtExceptionEvent
 import de.p10r.ra.RAClient
 import de.p10r.telegram.IncomingTelegramRequest
 import de.p10r.telegram.TelegramClient
 import de.p10r.telegram.TelegramConfig
-import de.p10r.telegram.TelegramConfig.BotId
-import de.p10r.telegram.TelegramConfig.BotSecret
 import de.p10r.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
-import de.p10r.telegram.TelegramConfig.TelegramSecret
+import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.telegram.TelegramMessage
-import okhttp3.OkHttpClient
-import org.http4k.client.OkHttp
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -35,46 +33,6 @@ import org.http4k.lens.Validator
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.server.SunHttp
-import org.http4k.server.asServer
-import kotlin.system.measureTimeMillis
-
-
-fun main() {
-  measureTimeMillis {
-    ProdApp().asServer(SunHttp(8080)).start()
-  }.let { println("Server started in $it ms") }
-}
-
-//TODO check connection
-fun ProdApp(): HttpHandler {
-  val driver = JdbcSqliteDriver("jdbc:sqlite:src/main/resources/pedro-local.db")
-  val db = Database(driver).apply { Schema.create(driver) }
-  val client = OkHttpClient.Builder()
-    .followRedirects(true)
-    .build()
-    .let { OkHttp(it) }
-
-  val events: Events = {}
-  val telegramConfig = TelegramConfig.of(
-    uri = Uri.of("https://api.telegram.org"),
-    outgoingHttp = client,
-    botId = BotId(""), // TODO
-    botSecret = BotSecret(""),// TODO
-    secret = TelegramSecret(""), // TODO
-    events = events
-  )
-
-  return App(
-    database = db,
-    raUri = Uri.of("https://ra.co"),
-    raHttp = client,
-    events = {}, // TODO
-    telegramConfig = telegramConfig,
-    users = listOf(UserId(1234)), // TODO
-    features = Features()
-  )
-}
 
 private val inputUrl = FormField.map { InputUrl.ofOrNull(it) }.required("url")
 private val idFrom = Body.webForm(Validator.Feedback, inputUrl).toLens()
@@ -110,7 +68,7 @@ fun App(
 
 private fun AppRoutes(
   artistsRegistry: ArtistsRegistry,
-  secret: TelegramSecret,
+  secret: IncomingTelegramRequestSecret,
   users: List<UserId>,
   telegramClient: TelegramClient,
 ) = routes(
@@ -139,7 +97,7 @@ private fun AppRoutes(
 
 fun TelegramSecurityFilter(
   users: List<UserId>,
-  secret: TelegramSecret
+  secret: IncomingTelegramRequestSecret
 ) = Filter { next ->
   { req ->
     val payload = telegramCommand(req).message
@@ -154,6 +112,6 @@ fun TelegramSecurityFilter(
 }
 
 // TODO use header lens
-private fun Request.has(secret: TelegramSecret) =
+private fun Request.has(secret: IncomingTelegramRequestSecret) =
   header(TELEGRAM_SECRET_HEADER) != null
     && header(TELEGRAM_SECRET_HEADER) == secret.value

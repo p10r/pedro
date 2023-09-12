@@ -1,6 +1,6 @@
 package de.p10r.telegram
 
-import de.p10r.AppOutgoingHttp
+import de.p10r.infrastructure.AppOutgoingHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -11,7 +11,7 @@ data class TelegramConfig private constructor(
   val outgoingHttp: HttpHandler,
   val botId: BotId,
   val botSecret: BotSecret,
-  val secret: TelegramSecret
+  val secret: IncomingTelegramRequestSecret
 ) {
   companion object {
     const val TELEGRAM_SECRET_HEADER = "X-Telegram-Bot-Api-Secret-Token"
@@ -21,7 +21,7 @@ data class TelegramConfig private constructor(
       outgoingHttp: HttpHandler,
       botId: BotId,
       botSecret: BotSecret,
-      secret: TelegramSecret,
+      secret: IncomingTelegramRequestSecret,
       events: Events
     ): TelegramConfig {
       val http = ClientFilters.SetBaseUriFrom(uri).then(outgoingHttp)
@@ -37,6 +37,6 @@ data class TelegramConfig private constructor(
 
   data class BotId(val value: String)
   data class BotSecret(val value: String)
-  data class TelegramSecret(val value: String)
+  data class IncomingTelegramRequestSecret(val value: String)
 }
 
