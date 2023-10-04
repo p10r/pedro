@@ -50,7 +50,7 @@ fun App(
   users: List<UserId>,
   @Suppress("UNUSED_PARAMETER") features: Features,
 ): HttpHandler {
-  val artistRepository = ArtistRepository(database)
+  val artistRepository = SqliteArtistRepository(database)
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
   //TODO remove events as last parameter

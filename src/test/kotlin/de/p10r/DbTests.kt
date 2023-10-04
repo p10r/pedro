@@ -5,15 +5,16 @@ import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class ArtistRepositoryTests {
-  val db = Database.new()
-  val repository = ArtistRepository(db)
-  val sql = db.artistQueries
+class SqliteTests : ArtistRepositoryTests(SqliteArtistRepository(Database.new()))
+
+class DynamoTests : ArtistRepositoryTests(DynamoDbRepository())
+
+abstract class ArtistRepositoryTests(val repository: ArtistRepository) {
 
   @Test
   fun `find all stored artists`() {
-    sql.create("Boys Noize").executeAsOne()
-    sql.create("Daft Punk").executeAsOne()
+    repository.create(NewArtist("Boys Noize"))
+    repository.create(NewArtist("Daft Punk"))
 
     assertEquals(
       Success(

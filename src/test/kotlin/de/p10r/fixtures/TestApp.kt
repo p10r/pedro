@@ -12,7 +12,6 @@ import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RASlug
 import de.p10r.telegram.TelegramConfig
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
@@ -48,7 +47,7 @@ fun TestApp(
     botSecret = TelegramConfig.BotSecret("456"),
     secret = TelegramConfig.IncomingTelegramRequestSecret("secret"),
     events = {},
-    outgoingHttp = { req: Request -> Response(Status.OK) },
+    outgoingHttp = { Response(Status.OK) },
     uri = Uri.of("http://localtelegram")
   ),
   users: List<UserId> = listOf(UserId(1)),

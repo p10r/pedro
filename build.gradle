@@ -38,6 +38,7 @@ test {
 
 dependencies {
   implementation(platform("org.http4k:http4k-bom:5.1.1.1"))
+  implementation platform("org.http4k:http4k-connect-bom:5.2.3.0")
   implementation(platform("dev.forkhandles:forkhandles-bom:2.5.0.0"))
 
   implementation("org.http4k:http4k-core")
@@ -45,11 +46,13 @@ dependencies {
   implementation("org.http4k:http4k-format-jackson")
   implementation("org.http4k:http4k-server-undertow")
   implementation("org.http4k:http4k-client-okhttp")
+  implementation("org.http4k:http4k-connect-amazon-dynamodb")
+  implementation("org.http4k:http4k-connect-amazon-dynamodb-fake")
 
   testImplementation("org.http4k:http4k-testing-approval")
   testImplementation("org.http4k:http4k-testing-chaos")
-  testImplementation("org.http4k:http4k-testing-strikt")
   testImplementation("org.http4k:http4k-testing-tracerbullet")
+  testImplementation("io.strikt:strikt-jvm:0.34.0")
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 

@@ -35,14 +35,14 @@ class ArtistsRegistryTests {
       NewArtist("Justin Tinderdate"),
       NewArtist("Sinamin"),
     )
-    val repository = ArtistRepository(Database.new(existingArtists))
+    val repository = SqliteArtistRepository(Database.new(existingArtists))
     val artistsRegistry = ArtistsRegistry(repository, raClient)
     assertEquals(existingArtists, artistsRegistry.list().toNewArtists())
   }
 
   @Test
   fun `adds artist from resident advisor`() {
-    val repository = ArtistRepository(Database.new())
+    val repository = SqliteArtistRepository(Database.new())
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
     artistsRegistry.add(InputUrl.unsafe("https://ra.co/dj/justice"))
@@ -52,7 +52,7 @@ class ArtistsRegistryTests {
 
   @Test
   fun `doesn't add artist if already existing`() {
-    val repository = ArtistRepository(Database.new())
+    val repository = SqliteArtistRepository(Database.new())
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
     assertEquals(0, artistsRegistry.list().size)
