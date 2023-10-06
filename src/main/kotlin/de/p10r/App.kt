@@ -42,7 +42,7 @@ val telegramCommand = Body.auto<IncomingTelegramRequest>().toLens()
 data class UserId(val value: Int)
 
 fun App(
-  database: Database,
+  dynamoDbConfig: DynamoDbConfig,
   raUri: Uri,
   raHttp: HttpHandler,
   events: Events,
@@ -50,7 +50,9 @@ fun App(
   users: List<UserId>,
   @Suppress("UNUSED_PARAMETER") features: Features,
 ): HttpHandler {
-  val artistRepository = SqliteArtistRepository(database)
+  val artistRepository = ArtistRepository(
+    dynamoDbConfig.copy(http = AppOutgoingHttp(events, dynamoDbConfig.http)),
+  )
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
   //TODO remove events as last parameter

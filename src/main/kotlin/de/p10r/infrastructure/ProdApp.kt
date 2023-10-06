@@ -1,11 +1,11 @@
 package de.p10r.infrastructure
 
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import de.p10r.App
-import de.p10r.Database
+import de.p10r.DynamoDbConfig
 import de.p10r.UserId
 import de.p10r.telegram.TelegramConfig
 import okhttp3.OkHttpClient
+import org.http4k.aws.AwsCredentials
 import org.http4k.client.OkHttp
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
@@ -19,9 +19,14 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import kotlin.system.measureTimeMillis
 
+private val DYNAMO_URI = EnvironmentKey.uri()
+  .required("DYNAMO_URI")
 
-private val DB_URL = EnvironmentKey.string()
-  .required("DB_URI")
+private val DYNAMO_ID = EnvironmentKey.string()
+  .required("DYNAMO_ID")
+
+private val DYNAMO_SECRET = EnvironmentKey.string()
+  .required("DYNAMO_SECRET")
 
 private val TELEGRAM_URI = EnvironmentKey.uri()
   .defaulted("TELEGRAM_URI", Uri.of("https://api.telegram.org"))
@@ -57,8 +62,6 @@ fun main() {
 //TODO check connection
 fun ProdApp(env: Environment, events: Events): HttpHandler {
   try {
-    val driver = JdbcSqliteDriver(DB_URL(env))
-    val db = Database(driver).apply { Database.Schema.create(driver) }
     val client = OkHttpClient.Builder()
       .followRedirects(true)
       .build()
@@ -73,10 +76,16 @@ fun ProdApp(env: Environment, events: Events): HttpHandler {
       events = events
     )
 
+    val dynamoDbConfig = DynamoDbConfig(
+      uri = DYNAMO_URI(env),
+      http = client,
+      credentials = AwsCredentials(DYNAMO_ID(env), DYNAMO_SECRET(env))
+    )
+
     val raUri = RA_URI(env)
 
     return App(
-      database = db,
+      dynamoDbConfig = dynamoDbConfig,
       raUri = raUri,
       raHttp = client,
       events = events,

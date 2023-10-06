@@ -1,8 +1,6 @@
 package de.p10r.fixtures
 
 import de.p10r.App
-import de.p10r.Database
-import de.p10r.NewArtist
 import de.p10r.UserId
 import de.p10r.infrastructure.Features
 import de.p10r.infrastructure.loggingEvents
@@ -27,11 +25,6 @@ fun main() {
 }
 
 fun TestApp(
-  existingArtists: List<NewArtist> = listOf(
-    NewArtist("Boys Noize"),
-    NewArtist("Justin Tinderdate"),
-    NewArtist("Sinamin"),
-  ),
   raUri: Uri = Uri.of("http://ra.co"),
   raServer: HttpHandler = RAServer(
     mapOf(
@@ -52,11 +45,10 @@ fun TestApp(
   ),
   users: List<UserId> = listOf(UserId(1)),
   events: Events = {},
-  db: Database = Database.new(existingArtists)
 ): HttpHandler {
 
   return App(
-    database = db,
+    dynamoDbConfig = dynamoDbConfig,
     raUri = raUri,
     raHttp = raServer,
     events = loggingEvents() then events,

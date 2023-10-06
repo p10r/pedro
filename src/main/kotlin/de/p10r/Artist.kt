@@ -1,8 +1,6 @@
 package de.p10r
 
-import dev.forkhandles.values.LongValue
-import dev.forkhandles.values.LongValueFactory
-import dev.forkhandles.values.minValue
+import java.util.*
 
 data class Artist(
   val id: ArtistId,
@@ -13,8 +11,10 @@ data class NewArtist(
   val name: String
 )
 
-class ArtistId private constructor(id: Long) : LongValue(id) {
-  val id = "art-$id"
+data class ArtistId private constructor(val id: String) {
+  companion object {
+    fun new() = ArtistId("art-${UUID.randomUUID()}")
 
-  companion object : LongValueFactory<ArtistId>(::ArtistId, 1.toLong().minValue)
+    fun of(id: String) = ArtistId(id)
+  }
 }

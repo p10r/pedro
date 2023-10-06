@@ -44,7 +44,7 @@ class ApiTests {
     )
 
     expectThat(recordedEvents.filterIsInstance<HttpEvent.Incoming>()).hasSize(1)
-    expectThat(recordedEvents.filterIsInstance<HttpEvent.Outgoing>()).hasSize(1)
+    expectThat(recordedEvents.filterIsInstance<HttpEvent.Outgoing>()).hasSize(2)
   }
 
   @Test

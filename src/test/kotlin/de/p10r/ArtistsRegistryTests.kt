@@ -11,8 +11,9 @@ import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import strikt.api.expectThat
+import strikt.assertions.contains
 
 class ArtistsRegistryTests {
   val raClient = RAClient(
@@ -35,24 +36,25 @@ class ArtistsRegistryTests {
       NewArtist("Justin Tinderdate"),
       NewArtist("Sinamin"),
     )
-    val repository = SqliteArtistRepository(Database.new(existingArtists))
+    val repository = ArtistRepository.new(existingArtists)
     val artistsRegistry = ArtistsRegistry(repository, raClient)
-    assertEquals(existingArtists, artistsRegistry.list().toNewArtists())
+
+    expectThat(artistsRegistry.list().toNewArtists()).contains(existingArtists)
   }
 
   @Test
   fun `adds artist from resident advisor`() {
-    val repository = SqliteArtistRepository(Database.new())
+    val repository = ArtistRepository.new()
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
     artistsRegistry.add(InputUrl.unsafe("https://ra.co/dj/justice"))
 
-    assertTrue(artistsRegistry.list().contains(Artist(ArtistId.unsafe(1), "Justice")))
+    expectThat(artistsRegistry.list().toNewArtists()).contains(NewArtist("Justice"))
   }
 
   @Test
   fun `doesn't add artist if already existing`() {
-    val repository = SqliteArtistRepository(Database.new())
+    val repository = ArtistRepository.new()
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
     assertEquals(0, artistsRegistry.list().size)

@@ -41,7 +41,6 @@ class E2ETest {
   )
 
   val app = TestApp(
-    existingArtists = emptyList(),
     users = listOf(validUserId),
     telegramConfig = config
   )

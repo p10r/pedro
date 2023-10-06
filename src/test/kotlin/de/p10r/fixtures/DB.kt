@@ -1,17 +1,26 @@
 package de.p10r.fixtures
 
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import de.p10r.Database
+import de.p10r.ArtistRepository
+import de.p10r.DynamoDbConfig
 import de.p10r.NewArtist
+import org.http4k.aws.AwsCredentials
+import org.http4k.connect.amazon.dynamodb.FakeDynamoDb
+import org.http4k.core.Uri
 
-fun Database.Companion.new(
+val dynamoDbConfig = DynamoDbConfig(
+  uri = Uri.of("http://dynamo-db"),
+  http = FakeDynamoDb(),
+  credentials = AwsCredentials("id", "secret")
+)
+
+fun ArtistRepository.Companion.new(
   existingArtists: List<NewArtist> = emptyList()
-) = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).let {
-  Schema.create(it)
-  Database(it)
-}.also { db ->
-  existingArtists.forEach {
-    val id = db.artistQueries.create(it.name).executeAsOne()
-    println("Created $id ${it.name}")
-  }
+): ArtistRepository = ArtistRepository(
+  DynamoDbConfig(
+    uri = Uri.of("http://dynamo-db"),
+    http = FakeDynamoDb(),
+    credentials = AwsCredentials("id", "secret")
+  )
+).apply {
+  existingArtists.forEach { artist -> this.create(artist) }
 }
