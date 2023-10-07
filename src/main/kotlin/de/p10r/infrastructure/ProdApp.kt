@@ -43,12 +43,12 @@ private val TELEGRAM_REQ_SECRET = EnvironmentKey.string()
   .map(TelegramConfig::IncomingTelegramRequestSecret)
   .required("TELEGRAM_REQ_SECRET")
 
-private val RA_URI = EnvironmentKey.uri()
-  .defaulted("RA_URI", Uri.of("https://ra.co"))
-
 private val TELEGRAM_USER_IDS = EnvironmentKey.map { UserId(it.toInt()) }
   .multi
   .required("TELEGRAM_USER_IDS")
+
+private val RA_URI = EnvironmentKey.uri()
+  .defaulted("RA_URI", Uri.of("https://ra.co"))
 
 data class ServerStartedEvent(val ms: Long) : Event
 

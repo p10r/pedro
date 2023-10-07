@@ -1,5 +1,7 @@
 package de.p10r
 
+import de.p10r.fixtures.E2ETestApp
+import de.p10r.fixtures.Pedro
 import de.p10r.fixtures.TestApp
 import de.p10r.telegram.FakeTelegramServer
 import de.p10r.telegram.IncomingTelegramRequest
@@ -66,6 +68,13 @@ class E2ETest {
 //    expectThat(app.getAllArtists()).isNotEmpty()
     expectThat(chats[validUserId])
       .isEqualTo(mutableListOf(TelegramMessage("/add https://ra.co/dj/sabura")))
+  }
+
+  @Test
+  fun `lists artists`() {
+    val app: Pedro = E2ETestApp()
+
+    app.listArtists().also(::println)
   }
 
   private fun HttpHandler.getAllArtists() = this(Request(GET, "/artists")).let(artists)

@@ -1,6 +1,6 @@
 package de.p10r
 
-import de.p10r.fixtures.RAServer
+import de.p10r.fixtures.FakeRAServer
 import de.p10r.ra.RAArtist
 import de.p10r.ra.RAArtistResponse
 import de.p10r.ra.RAArtistResponse.RAData
@@ -54,7 +54,7 @@ class ProdRATests : RAContract(Uri.of("https://ra.co"), JavaHttpClient())
 
 class RATests : RAContract(
   uri = Uri.of("http://resident-advisor"),
-  client = RAServer(
+  client = FakeRAServer(
     mapOf(
       RASlug("boysnoize") to RAArtistResponse(
         RAData(

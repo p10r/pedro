@@ -26,7 +26,7 @@ fun main() {
 
 fun TestApp(
   raUri: Uri = Uri.of("http://ra.co"),
-  raServer: HttpHandler = RAServer(
+  raServer: HttpHandler = FakeRAServer(
     mapOf(
       RASlug("boysnoize") to RAArtistResponse(
         RAArtistResponse.RAData(

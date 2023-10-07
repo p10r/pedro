@@ -16,7 +16,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.net.URL
 
-fun RAServer(
+fun FakeRAServer(
   artistBySlugId: Map<RASlug, RAArtistResponse>
 ): RoutingHttpHandler = DebuggingFilters.PrintRequest().then(
   routes(
