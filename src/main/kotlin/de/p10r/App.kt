@@ -83,7 +83,6 @@ private fun AppRoutes(
   "/artists" bind GET to {
     Response(OK).with(artists of artistsRegistry.list())
   },
-  "/ping" bind GET to { Response(OK).body("pong") },
   "/telegram" bind POST to TelegramSecurityFilter(users, secret).then { req ->
     val msg = telegramCommand(req)
 
