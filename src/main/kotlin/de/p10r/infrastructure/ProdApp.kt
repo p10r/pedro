@@ -3,52 +3,44 @@ package de.p10r.infrastructure
 import de.p10r.App
 import de.p10r.DynamoDbConfig
 import de.p10r.UserId
+import de.p10r.infrastructure.PedroSettings.DYNAMO_ID
+import de.p10r.infrastructure.PedroSettings.DYNAMO_SECRET
+import de.p10r.infrastructure.PedroSettings.DYNAMO_URI
+import de.p10r.infrastructure.PedroSettings.RA_URI
+import de.p10r.infrastructure.PedroSettings.TELEGRAM_BOT_ID
+import de.p10r.infrastructure.PedroSettings.TELEGRAM_BOT_SECRET
+import de.p10r.infrastructure.PedroSettings.TELEGRAM_REQ_SECRET
+import de.p10r.infrastructure.PedroSettings.TELEGRAM_URI
+import de.p10r.infrastructure.PedroSettings.TELEGRAM_USER_IDS
 import de.p10r.telegram.TelegramConfig
+import de.p10r.telegram.TelegramConfig.BotId
+import de.p10r.telegram.TelegramConfig.BotSecret
+import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import okhttp3.OkHttpClient
 import org.http4k.aws.AwsCredentials
 import org.http4k.client.OkHttp
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.HttpHandler
-import org.http4k.core.Uri
 import org.http4k.events.Event
 import org.http4k.events.Events
-import org.http4k.lens.string
+import org.http4k.lens.of
 import org.http4k.lens.uri
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import kotlin.system.measureTimeMillis
 
-private val DYNAMO_URI = EnvironmentKey.uri()
-  .required("DYNAMO_URI")
-
-private val DYNAMO_ID = EnvironmentKey.string()
-  .required("DYNAMO_ID")
-
-private val DYNAMO_SECRET = EnvironmentKey.string()
-  .required("DYNAMO_SECRET")
-
-private val TELEGRAM_URI = EnvironmentKey.uri()
-  .defaulted("TELEGRAM_URI", Uri.of("https://api.telegram.org"))
-
-private val TELEGRAM_BOT_ID = EnvironmentKey.string()
-  .map(TelegramConfig::BotId)
-  .required("TELEGRAM_BOT_ID")
-
-private val TELEGRAM_BOT_SECRET = EnvironmentKey.string()
-  .map(TelegramConfig::BotSecret)
-  .required("TELEGRAM_BOT_SECRET")
-
-private val TELEGRAM_REQ_SECRET = EnvironmentKey.string()
-  .map(TelegramConfig::IncomingTelegramRequestSecret)
-  .required("TELEGRAM_REQ_SECRET")
-
-private val TELEGRAM_USER_IDS = EnvironmentKey.map { UserId(it.toInt()) }
-  .multi
-  .required("TELEGRAM_USER_IDS")
-
-private val RA_URI = EnvironmentKey.uri()
-  .defaulted("RA_URI", Uri.of("https://ra.co"))
+object PedroSettings {
+  val DYNAMO_URI by EnvironmentKey.uri().of().required()
+  val DYNAMO_ID by EnvironmentKey.of().required()
+  val DYNAMO_SECRET by EnvironmentKey.of().required()
+  val TELEGRAM_URI by EnvironmentKey.uri().of().required()
+  val TELEGRAM_BOT_ID by EnvironmentKey.of().required()
+  val TELEGRAM_BOT_SECRET by EnvironmentKey.of().required()
+  val TELEGRAM_REQ_SECRET by EnvironmentKey.of().required()
+  val TELEGRAM_USER_IDS by EnvironmentKey.of().required()
+  val RA_URI by EnvironmentKey.uri().of().required()
+}
 
 data class ServerStartedEvent(val ms: Long) : Event
 
@@ -70,9 +62,9 @@ fun ProdApp(env: Environment, events: Events): HttpHandler {
     val telegramConfig = TelegramConfig.of(
       uri = TELEGRAM_URI(env),
       outgoingHttp = client,
-      botId = TELEGRAM_BOT_ID(env),
-      botSecret = TELEGRAM_BOT_SECRET(env),
-      secret = TELEGRAM_REQ_SECRET(env),
+      botId = BotId(TELEGRAM_BOT_ID(env)),
+      botSecret = BotSecret(TELEGRAM_BOT_SECRET(env)),
+      secret = IncomingTelegramRequestSecret(TELEGRAM_REQ_SECRET(env)),
       events = events
     )
 
@@ -90,7 +82,7 @@ fun ProdApp(env: Environment, events: Events): HttpHandler {
       raHttp = client,
       events = events,
       telegramConfig = telegramConfig,
-      users = TELEGRAM_USER_IDS(env),
+      users = TELEGRAM_USER_IDS(env).split(",").map { UserId(it.toInt()) },
       features = Features()
     )
   } catch (e: Exception) {
