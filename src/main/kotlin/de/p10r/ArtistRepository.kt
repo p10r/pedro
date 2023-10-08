@@ -20,11 +20,12 @@ data class DynamoDbConfig(
   val credentials: AwsCredentials,
 )
 
+// TODO: Log error events
 class ArtistRepository(config: DynamoDbConfig) {
   companion object {}
 
   private val dynamoDb = DynamoDb.Http(
-    region = Region.CA_CENTRAL_1,
+    region = Region.EU_CENTRAL_1,
     credentialsProvider = { config.credentials },
     http = ClientFilters.SetBaseUriFrom(config.uri).then(config.http)
   )
@@ -33,9 +34,7 @@ class ArtistRepository(config: DynamoDbConfig) {
     dynamoDb.tableMapper<ArtistEntity, String, Unit>(
       tableName = TableName.of("artists"),
       hashKeyAttribute = Attribute.string().required("id")
-    ).also {
-      it.createTable()
-    }
+    )
 
   fun findAll(): List<Artist> =
     table.primaryIndex()

@@ -48,7 +48,7 @@ fun TestApp(
 ): HttpHandler {
 
   return App(
-    dynamoDbConfig = dynamoDbConfig,
+    dynamoDbConfig = dynamoDbConfig(),
     raUri = raUri,
     raHttp = raServer,
     events = loggingEvents() then events,

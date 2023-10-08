@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.hasSize
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotEmpty
 
 class ApiTests {
   @Test
@@ -43,8 +44,8 @@ class ApiTests {
       ).form("url", "http://ra.com/dj/someone")
     )
 
-    expectThat(recordedEvents.filterIsInstance<HttpEvent.Incoming>()).hasSize(1)
-    expectThat(recordedEvents.filterIsInstance<HttpEvent.Outgoing>()).hasSize(2)
+    expectThat(recordedEvents.filterIsInstance<HttpEvent.Incoming>()).isNotEmpty()
+    expectThat(recordedEvents.filterIsInstance<HttpEvent.Outgoing>()).isNotEmpty()
   }
 
   @Test

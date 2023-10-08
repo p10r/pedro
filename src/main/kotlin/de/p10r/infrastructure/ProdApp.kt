@@ -52,16 +52,19 @@ fun main() {
 }
 
 //TODO check connection
-fun ProdApp(env: Environment, events: Events): HttpHandler {
-  try {
-    val client = OkHttpClient.Builder()
-      .followRedirects(true)
-      .build()
-      .let { OkHttp(it) }
+fun ProdApp(
+  env: Environment,
+  events: Events,
+  http: HttpHandler = OkHttpClient.Builder()
+    .followRedirects(true)
+    .build()
+    .let { OkHttp(it) }
 
+): HttpHandler {
+  try {
     val telegramConfig = TelegramConfig.of(
       uri = TELEGRAM_URI(env),
-      outgoingHttp = client,
+      outgoingHttp = http,
       botId = BotId(TELEGRAM_BOT_ID(env)),
       botSecret = BotSecret(TELEGRAM_BOT_SECRET(env)),
       secret = IncomingTelegramRequestSecret(TELEGRAM_REQ_SECRET(env)),
@@ -70,7 +73,7 @@ fun ProdApp(env: Environment, events: Events): HttpHandler {
 
     val dynamoDbConfig = DynamoDbConfig(
       uri = DYNAMO_URI(env),
-      http = client,
+      http = http,
       credentials = AwsCredentials(DYNAMO_ID(env), DYNAMO_SECRET(env))
     )
 
@@ -79,7 +82,7 @@ fun ProdApp(env: Environment, events: Events): HttpHandler {
     return App(
       dynamoDbConfig = dynamoDbConfig,
       raUri = raUri,
-      raHttp = client,
+      raHttp = http,
       events = events,
       telegramConfig = telegramConfig,
       users = TELEGRAM_USER_IDS(env).split(",").map { UserId(it.toInt()) },

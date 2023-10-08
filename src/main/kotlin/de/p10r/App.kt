@@ -84,12 +84,15 @@ private fun AppRoutes(
     Response(OK).with(artists of artistsRegistry.list())
   },
   "/telegram" bind POST to TelegramSecurityFilter(users, secret).then { req ->
-    val msg = telegramCommand(req)
+    val payload = telegramCommand(req)
 
     when {
-      msg.message.entities.none { it.type == "bot_command" } -> Response(BAD_REQUEST)
-      else                                                   -> {
-        telegramClient.sendMessage(TelegramMessage(msg.message.text), msg.userId)
+      payload.message.entities.none { it.type == "bot_command" } -> Response(BAD_REQUEST)
+      else                                                       -> {
+        val text = payload.message.text.removePrefix("/add").trim()
+        val url = InputUrl.ofOrNull(text)
+        artistsRegistry.add(url!!) // TODO: answer back to caller
+        telegramClient.sendMessage(TelegramMessage(text), payload.userId)
         Response(OK)
       }
     }
