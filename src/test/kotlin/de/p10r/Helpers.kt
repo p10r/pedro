@@ -3,7 +3,7 @@ package de.p10r
 import strikt.api.Assertion
 import strikt.java.propertiesAreEqualToIgnoring
 
-fun InputUrl.Companion.unsafe(value: String) = ofOrNull(value)!!
+fun inputUrlOf(value: String) = InputUrl.ofOrNull(value)!!
 
 fun List<Artist>.toNewArtists() = map { it.toNewArtist() }
 fun Artist.toNewArtist() = NewArtist(name)

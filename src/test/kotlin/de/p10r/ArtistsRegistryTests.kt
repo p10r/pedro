@@ -47,7 +47,7 @@ class ArtistsRegistryTests {
     val repository = ArtistRepository.new()
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
-    artistsRegistry.add(InputUrl.unsafe("https://ra.co/dj/justice"))
+    artistsRegistry.add(inputUrlOf("https://ra.co/dj/justice"))
 
     expectThat(artistsRegistry.list().toNewArtists()).contains(NewArtist("Justice"))
   }
@@ -59,8 +59,8 @@ class ArtistsRegistryTests {
 
     assertEquals(0, artistsRegistry.list().size)
 
-    artistsRegistry.add(InputUrl.unsafe("https://ra.co/dj/justice"))
-    artistsRegistry.add(InputUrl.unsafe("https://ra.co/dj/justice"))
+    artistsRegistry.add(inputUrlOf("https://ra.co/dj/justice"))
+    artistsRegistry.add(inputUrlOf("https://ra.co/dj/justice"))
 
     assertEquals(1, artistsRegistry.list().size)
   }

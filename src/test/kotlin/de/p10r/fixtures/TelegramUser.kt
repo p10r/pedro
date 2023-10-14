@@ -4,7 +4,6 @@ import de.p10r.Artist
 import de.p10r.InputUrl
 import de.p10r.UserId
 import de.p10r.artists
-import de.p10r.ra.RASlug
 import de.p10r.telegram.IncomingTelegramRequest
 import de.p10r.telegram.TelegramConfig
 import de.p10r.telegramCommand
@@ -29,15 +28,14 @@ class TelegramUser(
     .then(ClientFilters.SetHostFrom(baseUri))
     .then(http)
 
-  fun followArtist(slug: RASlug) {
-    val artistUrl = InputUrl.ofOrNull("http://ra.co/dj/" + slug.value)!!
+  fun followArtist(url: InputUrl) {
     val req = Request(Method.POST, "/telegram")
       .header("X-Telegram-Bot-Api-Secret-Token", secret.value)
       .with(
         telegramCommand of IncomingTelegramRequest(
           IncomingTelegramRequest.Message(
             IncomingTelegramRequest.Message.From(userId.value),
-            text = "/add ${artistUrl.value}",
+            text = "/add ${url.value}",
             listOf(IncomingTelegramRequest.Message.Entity("bot_command"))
           )
         )
@@ -49,7 +47,6 @@ class TelegramUser(
   }
 
   fun listArtists(): List<Artist> {
-    followArtist(RASlug("boysnoize"))
     val res = http(Request(Method.GET, "/artists"))
     return artists(res)
   }
