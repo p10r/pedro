@@ -1,5 +1,8 @@
-package de.p10r
+package de.p10r.adapters.driven.db
 
+import de.p10r.domain.Artist
+import de.p10r.domain.ArtistId
+import de.p10r.domain.NewArtist
 import org.http4k.aws.AwsCredentials
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.dynamodb.DynamoDb

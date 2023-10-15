@@ -1,6 +1,6 @@
-package de.p10r
+package de.p10r.domain
 
-import de.p10r.ra.RASlug
+import de.p10r.adapters.driven.ra.RASlug
 
 data class InputUrl private constructor(val value: String) {
   companion object {

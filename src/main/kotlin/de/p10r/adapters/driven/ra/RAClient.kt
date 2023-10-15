@@ -1,4 +1,4 @@
-package de.p10r.ra
+package de.p10r.adapters.driven.ra
 
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler

@@ -1,9 +1,15 @@
 package de.p10r.telegram
 
 import de.p10r.UserId
-import de.p10r.telegram.TelegramConfig.BotId
-import de.p10r.telegram.TelegramConfig.BotSecret
-import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
+import de.p10r.adapters.driven.telegram.OutgoingTelegramMessageError
+import de.p10r.adapters.driven.telegram.TelegramClient
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driven.telegram.TelegramConfig.BotId
+import de.p10r.adapters.driven.telegram.TelegramConfig.BotSecret
+import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSecret
+import de.p10r.adapters.driven.telegram.TelegramMessage
+import de.p10r.adapters.driven.telegram.chatIdLens
+import de.p10r.adapters.driven.telegram.messageLens
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

@@ -1,5 +1,6 @@
-package de.p10r
+package de.p10r.adapters.driving
 
+import de.p10r.domain.InputUrl
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

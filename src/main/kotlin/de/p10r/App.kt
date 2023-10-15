@@ -1,10 +1,14 @@
 package de.p10r
 
+import de.p10r.adapters.driven.db.ArtistRepository
+import de.p10r.adapters.driven.db.DynamoDbConfig
+import de.p10r.adapters.driven.ra.RAClient
+import de.p10r.adapters.driven.telegram.TelegramClient
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driving.ApiRoutes
+import de.p10r.domain.ArtistsRegistry
 import de.p10r.infrastructure.AppOutgoingHttp
 import de.p10r.infrastructure.Features
-import de.p10r.ra.RAClient
-import de.p10r.telegram.TelegramClient
-import de.p10r.telegram.TelegramConfig
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.events.Events

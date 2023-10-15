@@ -1,8 +1,12 @@
 package de.p10r.infrastructure
 
 import de.p10r.App
-import de.p10r.DynamoDbConfig
 import de.p10r.UserId
+import de.p10r.adapters.driven.db.DynamoDbConfig
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driven.telegram.TelegramConfig.BotId
+import de.p10r.adapters.driven.telegram.TelegramConfig.BotSecret
+import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.infrastructure.PedroSettings.DYNAMO_ID
 import de.p10r.infrastructure.PedroSettings.DYNAMO_SECRET
 import de.p10r.infrastructure.PedroSettings.DYNAMO_URI
@@ -12,10 +16,6 @@ import de.p10r.infrastructure.PedroSettings.TELEGRAM_BOT_SECRET
 import de.p10r.infrastructure.PedroSettings.TELEGRAM_REQ_SECRET
 import de.p10r.infrastructure.PedroSettings.TELEGRAM_URI
 import de.p10r.infrastructure.PedroSettings.TELEGRAM_USER_IDS
-import de.p10r.telegram.TelegramConfig
-import de.p10r.telegram.TelegramConfig.BotId
-import de.p10r.telegram.TelegramConfig.BotSecret
-import de.p10r.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import okhttp3.OkHttpClient
 import org.http4k.aws.AwsCredentials
 import org.http4k.client.OkHttp

@@ -1,5 +1,8 @@
 package de.p10r
 
+import de.p10r.domain.Artist
+import de.p10r.domain.InputUrl
+import de.p10r.domain.NewArtist
 import strikt.api.Assertion
 import strikt.java.propertiesAreEqualToIgnoring
 

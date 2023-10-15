@@ -1,4 +1,4 @@
-package de.p10r.telegram
+package de.p10r.adapters.driven.telegram
 
 import de.p10r.UserId
 import org.http4k.core.Body

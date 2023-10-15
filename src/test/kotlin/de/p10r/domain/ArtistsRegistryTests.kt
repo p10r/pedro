@@ -1,10 +1,13 @@
-package de.p10r
+package de.p10r.domain
 
+import de.p10r.adapters.driven.db.ArtistRepository
+import de.p10r.adapters.driven.ra.RAArtist
+import de.p10r.adapters.driven.ra.RAArtistResponse
+import de.p10r.adapters.driven.ra.RAClient
+import de.p10r.adapters.driven.ra.raArtistResponse
 import de.p10r.fixtures.new
-import de.p10r.ra.RAArtist
-import de.p10r.ra.RAArtistResponse
-import de.p10r.ra.RAClient
-import de.p10r.ra.raArtistResponse
+import de.p10r.inputUrlOf
+import de.p10r.toNewArtists
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status

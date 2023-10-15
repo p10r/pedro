@@ -1,12 +1,12 @@
 package de.p10r.fixtures
 
-import de.p10r.Artist
-import de.p10r.InputUrl
 import de.p10r.UserId
-import de.p10r.artists
-import de.p10r.telegram.IncomingTelegramRequest
-import de.p10r.telegram.TelegramConfig
-import de.p10r.telegramCommand
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driving.IncomingTelegramRequest
+import de.p10r.adapters.driving.artists
+import de.p10r.adapters.driving.telegramCommand
+import de.p10r.domain.Artist
+import de.p10r.domain.InputUrl
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request

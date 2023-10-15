@@ -1,6 +1,7 @@
-package de.p10r
+package de.p10r.domain
 
-import de.p10r.ra.RAClient
+import de.p10r.adapters.driven.db.ArtistRepository
+import de.p10r.adapters.driven.ra.RAClient
 
 class ArtistsRegistry(
   private val repository: ArtistRepository,

@@ -1,9 +1,10 @@
-package de.p10r
+package de.p10r.adapters.driving
 
+import de.p10r.UserId
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driving.IncomingTelegramRequest.Message
+import de.p10r.domain.Artist
 import de.p10r.infrastructure.UncaughtExceptionEvent
-import de.p10r.telegram.IncomingTelegramRequest.Message
-import de.p10r.telegram.TelegramConfig
-import de.p10r.telegram.postTelegramMessage
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response

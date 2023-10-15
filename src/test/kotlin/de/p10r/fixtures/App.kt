@@ -1,6 +1,10 @@
 package de.p10r.fixtures
 
 import de.p10r.UserId
+import de.p10r.adapters.driven.ra.RAArtistResponse
+import de.p10r.adapters.driven.ra.RASlug
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.infrastructure.PedroSettings.DYNAMO_ID
 import de.p10r.infrastructure.PedroSettings.DYNAMO_SECRET
 import de.p10r.infrastructure.PedroSettings.DYNAMO_URI
@@ -13,11 +17,7 @@ import de.p10r.infrastructure.PedroSettings.TELEGRAM_USER_IDS
 import de.p10r.infrastructure.ProdApp
 import de.p10r.infrastructure.loggingEvents
 import de.p10r.infrastructure.then
-import de.p10r.ra.RAArtistResponse
-import de.p10r.ra.RASlug
 import de.p10r.telegram.FakeTelegramServer
-import de.p10r.telegram.TelegramConfig
-import de.p10r.telegram.TelegramMessage
 import org.http4k.cloudnative.env.Environment
 import org.http4k.connect.amazon.dynamodb.FakeDynamoDb
 import org.http4k.core.HttpHandler

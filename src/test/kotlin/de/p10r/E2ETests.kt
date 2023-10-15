@@ -1,13 +1,13 @@
 package de.p10r
 
+import de.p10r.adapters.driven.ra.RAArtist
+import de.p10r.adapters.driven.ra.RAArtistResponse
+import de.p10r.adapters.driven.ra.RASlug
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.fixtures.App
 import de.p10r.fixtures.TelegramUser
-import de.p10r.ra.RAArtist
-import de.p10r.ra.RAArtistResponse
-import de.p10r.ra.RASlug
 import de.p10r.scenarios.UseFromTelegramScenario
-import de.p10r.telegram.TelegramConfig
-import de.p10r.telegram.TelegramMessage
 import org.http4k.core.Uri
 
 class E2ETests : UseFromTelegramScenario {

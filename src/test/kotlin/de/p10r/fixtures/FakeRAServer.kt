@@ -1,9 +1,9 @@
 package de.p10r.fixtures
 
-import de.p10r.ra.RAArtistResponse
-import de.p10r.ra.RASlug
-import de.p10r.ra.raArtistResponse
-import de.p10r.ra.toGetArtistQuery
+import de.p10r.adapters.driven.ra.RAArtistResponse
+import de.p10r.adapters.driven.ra.RASlug
+import de.p10r.adapters.driven.ra.raArtistResponse
+import de.p10r.adapters.driven.ra.toGetArtistQuery
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

@@ -1,4 +1,4 @@
-package de.p10r.ra
+package de.p10r.adapters.driven.ra
 
 import java.time.LocalDate
 

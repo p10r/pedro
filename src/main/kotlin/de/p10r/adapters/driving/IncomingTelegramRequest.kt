@@ -1,4 +1,4 @@
-package de.p10r.telegram
+package de.p10r.adapters.driving
 
 import de.p10r.UserId
 

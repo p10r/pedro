@@ -1,10 +1,12 @@
-package de.p10r
+package de.p10r.adapters.driving
 
+import de.p10r.UserId
+import de.p10r.adapters.driven.telegram.TelegramConfig
+import de.p10r.adapters.driven.telegram.TelegramMessage
+import de.p10r.domain.Artist
+import de.p10r.domain.InputUrl
 import de.p10r.infrastructure.AppIncomingHttp
 import de.p10r.infrastructure.UncaughtExceptionEvent
-import de.p10r.telegram.IncomingTelegramRequest
-import de.p10r.telegram.TelegramConfig
-import de.p10r.telegram.TelegramMessage
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
@@ -18,14 +20,9 @@ import org.http4k.core.with
 import org.http4k.events.Events
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson.auto
-import org.http4k.lens.FormField
-import org.http4k.lens.Validator
-import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-private val inputUrl = FormField.map { InputUrl.ofOrNull(it) }.required("url")
-private val idFrom = Body.webForm(Validator.Feedback, inputUrl).toLens()
 val artists = Body.auto<List<Artist>>().toLens()
 val telegramCommand = Body.auto<IncomingTelegramRequest>().toLens()
 

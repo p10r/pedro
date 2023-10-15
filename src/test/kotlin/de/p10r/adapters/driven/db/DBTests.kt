@@ -1,6 +1,10 @@
-package de.p10r
+package de.p10r.adapters.driven.db
 
+import de.p10r.domain.Artist
+import de.p10r.domain.ArtistId
+import de.p10r.domain.NewArtist
 import de.p10r.fixtures.new
+import de.p10r.isEqualToIgnoringId
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.contains

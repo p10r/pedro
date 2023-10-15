@@ -1,4 +1,4 @@
-package de.p10r.telegram
+package de.p10r.adapters.driven.telegram
 
 import de.p10r.infrastructure.AppOutgoingHttp
 import org.http4k.core.HttpHandler
