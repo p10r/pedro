@@ -26,7 +26,7 @@ class TelegramApiTests {
     val req = Request(POST, "/").body(readTextFrom("incoming-telegram-request.json"))
       .header("ContentType", ContentType.APPLICATION_JSON.toHeaderValue())
 
-    expectThat(telegramCommand(req)).isA<IncomingTelegramRequest>()
+    expectThat(telegramReq(req)).isA<IncomingTelegramRequest>()
   }
 
   @Test
@@ -92,7 +92,7 @@ fun HttpHandler.postTelegramMessage(
 ) = Request(POST, "/telegram")
   .header(header.first, header.second)
   .with(
-    telegramCommand of IncomingTelegramRequest(
+    telegramReq of IncomingTelegramRequest(
       Message(
         from,
         text = text,

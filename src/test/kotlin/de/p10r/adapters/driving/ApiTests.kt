@@ -8,8 +8,6 @@ import de.p10r.domain.TelegramCommandResult
 import de.p10r.infrastructure.UncaughtExceptionEvent
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.events.Event
 import org.http4k.events.HttpEvent
@@ -55,7 +53,6 @@ class ApiTests {
     listAllArtists = listAllArtists,
     secret = TelegramConfig.IncomingTelegramRequestSecret("w/e"),
     users = users,
-    sendMessage = { _, _ -> Response(Status.OK) },
     events = recordedEvents::add
   )
 }

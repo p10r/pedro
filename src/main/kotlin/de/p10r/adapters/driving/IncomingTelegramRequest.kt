@@ -3,9 +3,18 @@ package de.p10r.adapters.driving
 import de.p10r.UserId
 import de.p10r.domain.TelegramCommand
 
-data class IncomingTelegramRequest(
-  val message: Message
-) {
+data class IncomingTelegramRequest(val message: Message) {
+  val userId = UserId(message.from.id)
+
+  data class Message(
+    val from: From,
+    val text: String,
+    val entities: List<Entity>
+  ) {
+    data class From(val id: Int)
+    data class Entity(val type: String)
+  }
+
   fun toCommand(): TelegramCommand? {
     val text = message.text
 
@@ -26,16 +35,5 @@ data class IncomingTelegramRequest(
       return TelegramCommand.ListArtists
 
     return null
-  }
-
-  val userId = UserId(message.from.id)
-
-  data class Message(
-    val from: From,
-    val text: String,
-    val entities: List<Entity>
-  ) {
-    data class From(val id: Int)
-    data class Entity(val type: String)
   }
 }

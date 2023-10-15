@@ -40,7 +40,6 @@ fun App(
     listAllArtists = artistsRegistry::list,
     secret = telegramConfig.secret,
     users = users,
-    telegramClient::sendMessage,
     events
   )
 }

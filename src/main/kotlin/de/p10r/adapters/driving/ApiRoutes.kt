@@ -2,7 +2,6 @@ package de.p10r.adapters.driving
 
 import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig
-import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.domain.Artist
 import de.p10r.domain.TelegramCommand
 import de.p10r.domain.TelegramCommandResult
@@ -25,14 +24,13 @@ import org.http4k.routing.routes
 
 val artists = Body.auto<List<ArtistResponse>>().toLens()
 fun List<Artist>.toResponse() = map { ArtistResponse(it.name) }
-val telegramCommand = Body.auto<IncomingTelegramRequest>().toLens()
+val telegramReq = Body.auto<IncomingTelegramRequest>().toLens()
 
 fun ApiRoutes(
   processTelegramCommands: (TelegramCommand) -> TelegramCommandResult,
   listAllArtists: () -> List<Artist>,
   secret: TelegramConfig.IncomingTelegramRequestSecret,
   users: List<UserId>,
-  sendMessage: (message: TelegramMessage, userId: UserId) -> Response,
   events: Events,
 ) = AppIncomingHttp(
   events,

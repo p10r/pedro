@@ -9,9 +9,9 @@ import de.p10r.domain.TelegramCommandResult.Artists
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.core.with
 
@@ -20,7 +20,7 @@ fun TelegramApi(
   secret: TelegramConfig.IncomingTelegramRequestSecret,
   process: (TelegramCommand) -> TelegramCommandResult
 ) = TelegramSecurityFilter(users, secret).then { req ->
-  val payload = telegramCommand(req)
+  val payload = telegramReq(req)
 
   if (payload.message.entities.none { it.type == "bot_command" })
     return@then Response(BAD_REQUEST)
@@ -39,13 +39,13 @@ fun TelegramSecurityFilter(
   secret: TelegramConfig.IncomingTelegramRequestSecret
 ) = Filter { next ->
   { req ->
-    val payload = telegramCommand(req).message
+    val payload = telegramReq(req)
 
     when {
-      !req.has(secret)                                   -> Response(Status.UNAUTHORIZED)
-      !users.contains(UserId(payload.from.id))           -> Response(Status.UNAUTHORIZED)
-      payload.entities.none { it.type == "bot_command" } -> Response(BAD_REQUEST)
-      else                                               -> next(req)
+      !req.has(secret)                                           -> Response(UNAUTHORIZED)
+      !users.contains(payload.userId)                            -> Response(UNAUTHORIZED)
+      payload.message.entities.none { it.type == "bot_command" } -> Response(BAD_REQUEST)
+      else                                                       -> next(req)
     }
   }
 }
