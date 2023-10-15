@@ -6,7 +6,6 @@ import de.p10r.adapters.driven.ra.RAArtistResponse
 import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.ra.raArtistResponse
 import de.p10r.fixtures.new
-import de.p10r.inputUrlOf
 import de.p10r.toNewArtists
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -50,7 +49,7 @@ class ArtistsRegistryTests {
     val repository = ArtistRepository.new()
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
-    artistsRegistry.add(inputUrlOf("https://ra.co/dj/justice"))
+    artistsRegistry.add("justice")
 
     expectThat(artistsRegistry.list().toNewArtists()).contains(NewArtist("Justice"))
   }
@@ -62,8 +61,8 @@ class ArtistsRegistryTests {
 
     assertEquals(0, artistsRegistry.list().size)
 
-    artistsRegistry.add(inputUrlOf("https://ra.co/dj/justice"))
-    artistsRegistry.add(inputUrlOf("https://ra.co/dj/justice"))
+    artistsRegistry.add("https://ra.co/dj/justice")
+    artistsRegistry.add("https://ra.co/dj/justice")
 
     assertEquals(1, artistsRegistry.list().size)
   }

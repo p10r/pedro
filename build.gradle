@@ -53,6 +53,7 @@ dependencies {
   testImplementation("org.http4k:http4k-testing-tracerbullet")
   testImplementation("io.strikt:strikt-jvm:0.34.0")
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:${junitVersion}")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
   implementation("dev.forkhandles:result4k")

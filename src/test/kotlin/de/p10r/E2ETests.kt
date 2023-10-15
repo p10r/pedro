@@ -7,10 +7,10 @@ import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.fixtures.App
 import de.p10r.fixtures.TelegramUser
-import de.p10r.scenarios.UseFromTelegramScenario
+import de.p10r.scenarios.TelegramUserScenarios
 import org.http4k.core.Uri
 
-class E2ETests : UseFromTelegramScenario {
+class E2ETests : TelegramUserScenarios {
   val userId = UserId(1)
   val raArtists = mapOf(
     RASlug("boysnoize") to RAArtistResponse(

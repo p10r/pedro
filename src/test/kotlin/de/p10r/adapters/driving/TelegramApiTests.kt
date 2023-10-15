@@ -4,6 +4,7 @@ import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
 import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.adapters.driving.IncomingTelegramRequest.Message
+import de.p10r.domain.TelegramCommandResult
 import de.p10r.readTextFrom
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
@@ -70,19 +71,31 @@ class TelegramApiTests {
     ).isEqualTo(Response(UNAUTHORIZED))
   }
 
+  @Test
+  fun `returns 400 if command is unknown`() {
+    val api = TelegramApi(
+      listOf(UserId(1)),
+      secret = IncomingTelegramRequestSecret("secret")
+    ) { TelegramCommandResult.AddedArtist }
+
+    expectThat(api.postTelegramMessage(text = "/idk asd"))
+      .isEqualTo(Response(BAD_REQUEST))
+  }
 }
 
+// TODO merge with helpers.kt
 fun HttpHandler.postTelegramMessage(
   entity: Message.Entity = Message.Entity("bot_command"),
   from: Message.From = Message.From(id = 1),
-  header: Pair<String, String> = TELEGRAM_SECRET_HEADER to "secret"
+  header: Pair<String, String> = TELEGRAM_SECRET_HEADER to "secret",
+  text: String = "/add http://ra.com/dj/my_fav_artist",
 ) = Request(POST, "/telegram")
   .header(header.first, header.second)
   .with(
     telegramCommand of IncomingTelegramRequest(
       Message(
         from,
-        text = "/add my_fav_artist",
+        text = text,
         listOf(entity)
       )
     )

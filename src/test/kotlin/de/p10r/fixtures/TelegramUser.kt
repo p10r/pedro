@@ -2,13 +2,13 @@ package de.p10r.fixtures
 
 import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig
-import de.p10r.adapters.driving.IncomingTelegramRequest
+import de.p10r.adapters.driving.ArtistResponse
 import de.p10r.adapters.driving.artists
 import de.p10r.adapters.driving.telegramCommand
-import de.p10r.domain.Artist
-import de.p10r.domain.InputUrl
+import de.p10r.incomingTelegramReqOf
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
@@ -28,26 +28,31 @@ class TelegramUser(
     .then(ClientFilters.SetHostFrom(baseUri))
     .then(http)
 
-  fun followArtist(url: InputUrl) {
-    val req = Request(Method.POST, "/telegram")
+  fun followArtist(url: String) {
+    val res = Request(POST, "/telegram")
       .header("X-Telegram-Bot-Api-Secret-Token", secret.value)
-      .with(
-        telegramCommand of IncomingTelegramRequest(
-          IncomingTelegramRequest.Message(
-            IncomingTelegramRequest.Message.From(userId.value),
-            text = "/add ${url.value}",
-            listOf(IncomingTelegramRequest.Message.Entity("bot_command"))
-          )
-        )
-      )
-
-    val res = http(req)
+      .with(telegramCommand of incomingTelegramReqOf(userId, "/add $url"))
+      .let(http)
 
     expectThat(res.status).isEqualTo(Status.OK)
   }
 
-  fun listArtists(): List<Artist> {
-    val res = http(Request(Method.GET, "/artists"))
+  fun listArtists(): List<ArtistResponse> {
+    val res = http(Request(GET, "/artists"))
+
+    expectThat(res.status).isEqualTo(Status.OK)
+
+    return artists(res)
+  }
+
+  fun listArtistsViaTelegram(): List<ArtistResponse> {
+    val res = Request(POST, "/telegram")
+      .header("X-Telegram-Bot-Api-Secret-Token", secret.value)
+      .with(telegramCommand of incomingTelegramReqOf(userId, "/list"))
+      .let(http)
+
+    expectThat(res.status).isEqualTo(Status.OK)
+
     return artists(res)
   }
 }

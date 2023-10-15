@@ -2,6 +2,7 @@ package de.p10r.domain
 
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.ra.RAClient
+import de.p10r.adapters.driven.ra.RASlug
 
 class ArtistsRegistry(
   private val repository: ArtistRepository,
@@ -9,9 +10,10 @@ class ArtistsRegistry(
 ) {
   fun list(): List<Artist> = repository.findAll()
 
-  fun add(inputUrl: InputUrl) {
-    val artist = raClient.getArtistBy(inputUrl.toRASlug()) ?: return
-    if (repository.findByName(artist.name) != null) return
-    repository.create(NewArtist(artist.name))
+  fun add(artist: String) {
+    val result = raClient.getArtistBy(RASlug(artist)) ?: return
+
+    if (repository.findByName(result.name) != null) return
+    repository.create(NewArtist(result.name))
   }
 }
