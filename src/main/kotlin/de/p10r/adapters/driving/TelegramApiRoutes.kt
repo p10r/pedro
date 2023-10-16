@@ -25,10 +25,10 @@ fun TelegramApi(
   if (payload.message.entities.none { it.type == "bot_command" })
     return@then Response(BAD_REQUEST)
 
-  val text = payload.toCommand()
+  val userCommand = payload.toCommand()
     ?: return@then Response(BAD_REQUEST)
 
-  return@then when (val result = process(text)) {
+  return@then when (val result = process(userCommand)) {
     is AddedArtist -> Response(OK)
     is Artists     -> Response(OK).with(artists of result.artists.toResponse())
   }

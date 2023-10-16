@@ -1,5 +1,6 @@
 package de.p10r.adapters.driving
 
+import de.p10r.domain.ArtistName
 import de.p10r.domain.UserCommand
 import de.p10r.domain.UserId
 
@@ -23,12 +24,7 @@ data class IncomingTelegramRequest(val message: Message) {
         .removePrefix("/add")
         .trim()
 
-      val baseUrl = "http://ra.co/dj/"
-      val sanitized =
-        if (input.startsWith(baseUrl)) input.removePrefix(baseUrl)
-        else input
-
-      return UserCommand.FollowArtist(userId, sanitized)
+      return UserCommand.FollowArtist(userId, ArtistName.of(input))
     }
 
     if (text.startsWith("/list"))

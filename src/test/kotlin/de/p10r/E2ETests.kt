@@ -6,13 +6,14 @@ import de.p10r.adapters.driven.ra.RASlug
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.domain.UserId
-import de.p10r.fixtures.App
-import de.p10r.fixtures.TelegramUser
+import de.p10r.fixtures.HttpTelegramUser
+import de.p10r.fixtures.TestE2EApp
 import de.p10r.scenarios.TelegramUserScenarios
 import org.http4k.core.Uri
 
 class E2ETests : TelegramUserScenarios {
-  val userId = UserId(1)
+  val sarahsId = UserId(1)
+  val joesId = UserId(2)
   val raArtists = mapOf(
     RASlug("boysnoize") to RAArtistResponse(
       RAArtistResponse.RAData(
@@ -31,17 +32,26 @@ class E2ETests : TelegramUserScenarios {
     )
   )
 
-  val system = App(
+  val system = TestE2EApp(
     telegramChats = mapOf(
-      userId to mutableListOf<TelegramMessage>(),
+      sarahsId to mutableListOf<TelegramMessage>(),
+      joesId to mutableListOf<TelegramMessage>(),
     ),
     raArtists = raArtists
   )
 
-  override val telegramUser = TelegramUser(
-    userId = userId,
+  override val sarah = HttpTelegramUser(
+    userId = sarahsId,
     secret = TelegramConfig.IncomingTelegramRequestSecret("telegram-request-secret"),
     baseUri = Uri.of("http://pedro"),
     http = system
   )
+
+  override val joe = HttpTelegramUser(
+    userId = joesId,
+    secret = TelegramConfig.IncomingTelegramRequestSecret("telegram-request-secret"),
+    baseUri = Uri.of("http://pedro"),
+    http = system
+  )
+
 }

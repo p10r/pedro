@@ -13,26 +13,35 @@ class UserCommandHub(
   fun process(command: UserCommand): UserCommandResult {
     return when (command) {
       is FollowArtist -> {
-        val result = raClient.getArtistBy(RASlug(command.artist))
+        val result = raClient.getArtistBy(RASlug(command.artist.value))
           ?: return UserCommandResult.AddedArtist
 
-        if (repository.findByName(result.name) != null)
-          return UserCommandResult.AddedArtist
-
-        repository.create(NewArtist(result.name))
-
+        repository.save(NewArtist(result.name), command.userId)
         UserCommandResult.AddedArtist
       }
 
       is ListArtists  -> {
-        UserCommandResult.Artists(repository.findAllFor(command.userId))
+        UserCommandResult.Artists(repository.findAllBy(command.userId))
       }
     }
   }
 }
 
+data class ArtistName private constructor(val value: String) {
+  companion object {
+    fun of(input: String): ArtistName {
+      val baseUrl = "http://ra.co/dj/"
+      val sanitized =
+        if (input.startsWith(baseUrl)) input.removePrefix(baseUrl)
+        else input
+
+      return ArtistName(sanitized)
+    }
+  }
+}
+
 sealed interface UserCommand {
-  data class FollowArtist(val userId: UserId, val artist: String) : UserCommand
+  data class FollowArtist(val userId: UserId, val artist: ArtistName) : UserCommand
   data class ListArtists(val userId: UserId) : UserCommand
 }
 

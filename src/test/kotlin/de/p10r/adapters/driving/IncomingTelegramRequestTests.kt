@@ -1,5 +1,6 @@
 package de.p10r.adapters.driving
 
+import de.p10r.domain.ArtistName
 import de.p10r.domain.UserCommand.FollowArtist
 import de.p10r.domain.UserCommand.ListArtists
 import de.p10r.domain.UserId
@@ -12,10 +13,10 @@ class IncomingTelegramRequestTests {
   @Test
   fun `maps to TelegramCommand`() {
     expectThat(incomingTelegramReqOf(UserId(1), "/add http://ra.co/dj/mom").toCommand())
-      .isEqualTo(FollowArtist(UserId(1), "mom"))
+      .isEqualTo(FollowArtist(UserId(1), ArtistName.of("mom")))
 
     expectThat(incomingTelegramReqOf(UserId(1), "/add mom").toCommand())
-      .isEqualTo(FollowArtist(UserId(1), "mom"))
+      .isEqualTo(FollowArtist(UserId(1), ArtistName.of("mom")))
 
     expectThat(incomingTelegramReqOf(UserId(1), "/list").toCommand())
       .isEqualTo(ListArtists(UserId(1)))

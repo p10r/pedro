@@ -31,5 +31,5 @@ fun DynamoDb.createPedroTables() =
 fun ArtistRepository.Companion.new(
   existingArtists: List<NewArtist> = emptyList()
 ): ArtistRepository = ArtistRepository(dynamoDbConfig()).apply {
-  existingArtists.forEach { artist -> this.create(artist) }
+  existingArtists.forEach { artist -> this.save(artist) }
 }

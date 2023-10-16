@@ -1,8 +1,10 @@
 package de.p10r.adapters.driven.db
 
+import de.p10r.containsExactlyInAnyOrderIgnoringIds
 import de.p10r.domain.Artist
 import de.p10r.domain.ArtistId
 import de.p10r.domain.NewArtist
+import de.p10r.domain.UserId
 import de.p10r.fixtures.new
 import de.p10r.isEqualToIgnoringId
 import org.junit.jupiter.api.Test
@@ -17,8 +19,8 @@ class DBTests {
 
   @Test
   fun `find all stored artists`() {
-    repository.create(NewArtist("Boys Noize"))
-    repository.create(NewArtist("Daft Punk"))
+    repository.save(NewArtist("Boys Noize"))
+    repository.save(NewArtist("Daft Punk"))
 
     val stored = repository.findAll().map { it.name }
 
@@ -28,7 +30,7 @@ class DBTests {
 
   @Test
   fun `insert a new artist`() {
-    repository.create(NewArtist("Me"))
+    repository.save(NewArtist("Me"))
 
     val stored = repository.findAll()
 
@@ -39,16 +41,49 @@ class DBTests {
   @Test
   fun `find artist by name`() {
     with(repository) {
-      create(NewArtist("Me"))
-      create(NewArtist("You"))
-      create(NewArtist("Them"))
-      create(NewArtist("sOmEoNe ElSe"))
+      save(NewArtist("Me"))
+      save(NewArtist("You"))
+      save(NewArtist("Them"))
+      save(NewArtist("sOmEoNe ElSe"))
 
       expectThat(findByName("You")).isNotNull()
         .isEqualToIgnoringId(Artist(ArtistId.of("w/e"), "You"))
 
       expectThat(findByName("someone else")).isNotNull()
         .isEqualToIgnoringId(Artist(ArtistId.of("w/e"), "sOmEoNe ElSe"))
+    }
+  }
+
+  @Test
+  fun `find artist by user id`() {
+    val joe = UserId(1)
+    val sarah = UserId(2)
+    with(repository) {
+      val boysNoize = NewArtist("Boys Noize")
+      val disclosure = NewArtist("Disclosure")
+      val sabura = NewArtist("Sabura")
+      val erobique = NewArtist("erobique")
+
+      save(boysNoize, joe)
+      save(boysNoize, sarah)
+      save(disclosure, sarah)
+      save(sabura, joe)
+      save(erobique, joe)
+
+      expectThat(findAllBy(joe)).containsExactlyInAnyOrderIgnoringIds(
+        listOf(
+          Artist.of(boysNoize),
+          Artist.of(sabura),
+          Artist.of(erobique)
+        )
+      )
+
+      expectThat(findAllBy(sarah)).containsExactlyInAnyOrderIgnoringIds(
+        listOf(
+          Artist.of(boysNoize),
+          Artist.of(disclosure),
+        )
+      )
     }
   }
 

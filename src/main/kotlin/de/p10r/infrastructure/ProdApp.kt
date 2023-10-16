@@ -85,7 +85,7 @@ fun ProdApp(
       raHttp = http,
       events = events,
       telegramConfig = telegramConfig,
-      users = TELEGRAM_USER_IDS(env).split(",").map { UserId(it.toInt()) },
+      users = TELEGRAM_USER_IDS(env).split(":").map { UserId(it.toInt()) },
       features = Features()
     )
   } catch (e: Exception) {

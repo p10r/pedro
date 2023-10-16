@@ -40,16 +40,15 @@ class ArtistRepository(config: DynamoDbConfig) {
       hashKeyAttribute = Attribute.string().required("id")
     )
 
-  fun findAllFor(userId: UserId): List<Artist> =
+  fun findAllBy(userId: UserId): List<Artist> =
     table.primaryIndex()
       .scan()
       .toList()
+      .filter { it.followedBy.contains(userId) }
       .map { entity -> Artist(ArtistId.of(entity.id), entity.name) }
 
-  fun findAll() =
-    table.primaryIndex()
-      .scan()
-      .toList()
+  fun findAll(): List<Artist> =
+    findAllEntities()
       .map { entity -> Artist(ArtistId.of(entity.id), entity.name) }
 
   fun findByName(name: String): Artist? =
@@ -57,19 +56,46 @@ class ArtistRepository(config: DynamoDbConfig) {
       artist.name.lowercase() == name.lowercase()
     }
 
+  fun save(newArtist: NewArtist, userId: UserId? = null): Artist {
+    val entity: ArtistEntity? = findEntityByName(newArtist.name)
+    println("saving $newArtist for userId $userId")
+    if (entity == null) {
+      val artist = Artist(ArtistId.new(), newArtist.name)
+      table.save(ArtistEntity.of(artist, userId))
+      return artist
+    }
 
-  fun create(newArtist: NewArtist): Artist {
-    val artist = Artist(ArtistId.new(), newArtist.name)
-    table.save(ArtistEntity.of(artist))
-    return artist
+    if (userId != null) {
+      val document = entity.copy(followedBy = entity.followedBy + userId)
+      println("saving updated $document")
+      table.save(document)
+      return Artist(ArtistId(entity.id), entity.name)
+    }
+
+    return Artist(ArtistId(entity.id), entity.name)
   }
+
+  private fun findAllEntities(): List<ArtistEntity> =
+    table.primaryIndex()
+      .scan()
+      .toList()
+
+  private fun findEntityByName(name: String): ArtistEntity? =
+    findAllEntities().firstOrNull { artist ->
+      artist.name.lowercase() == name.lowercase()
+    }
 
   private data class ArtistEntity(
     val id: String,
-    val name: String
+    val name: String,
+    val followedBy: Set<UserId>
   ) {
     companion object {
-      fun of(artist: Artist) = ArtistEntity(artist.id.toString(), artist.name)
+      fun of(artist: Artist, userId: UserId?) = ArtistEntity(
+        id = artist.id.toString(),
+        name = artist.name,
+        followedBy = if (userId == null) emptySet() else setOf(userId)
+      )
     }
   }
 }

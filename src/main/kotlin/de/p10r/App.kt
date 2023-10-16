@@ -3,7 +3,6 @@ package de.p10r
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.db.DynamoDbConfig
 import de.p10r.adapters.driven.ra.RAClient
-import de.p10r.adapters.driven.telegram.TelegramClient
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.ApiRoutes
 import de.p10r.domain.ArtistsRegistry
@@ -30,9 +29,6 @@ fun App(
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository)
   val userCommandHub = UserCommandHub(artistRepository, raClient)
-  //TODO remove events as last parameter
-  val telegramClient = TelegramClient(telegramConfig, events)
-
 
   return ApiRoutes(
     processTelegramCommands = userCommandHub::process,

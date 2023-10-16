@@ -29,7 +29,7 @@ import org.http4k.routing.reverseProxyRouting
 import org.http4k.routing.routes
 
 
-class App(
+class TestE2EApp(
   telegramChats: Map<UserId, MutableList<TelegramMessage>>,
   raArtists: Map<RASlug, RAArtistResponse>,
 ) : HttpHandler {
@@ -43,7 +43,7 @@ class App(
     TELEGRAM_BOT_ID of "telegram-bot-id",
     TELEGRAM_BOT_SECRET of "telegram-bot-secret",
     TELEGRAM_REQ_SECRET of "telegram-request-secret",
-    TELEGRAM_USER_IDS of telegramChats.keys.map { it.value }.joinToString(","),
+    TELEGRAM_USER_IDS of telegramChats.keys.map { it.value }.joinToString(":"),
     RA_URI of Uri.of("http://resident-advisor"),
   )
 

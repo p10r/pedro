@@ -15,7 +15,7 @@ data class NewArtist(
   val name: String
 )
 
-data class ArtistId private constructor(val id: String) {
+data class ArtistId(val id: String) {
   companion object {
     fun new() = ArtistId("art-${UUID.randomUUID()}")
 
