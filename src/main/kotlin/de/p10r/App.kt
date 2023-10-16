@@ -5,7 +5,6 @@ import de.p10r.adapters.driven.db.DynamoDbConfig
 import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.ApiRoutes
-import de.p10r.domain.ArtistsRegistry
 import de.p10r.domain.UserCommandHub
 import de.p10r.domain.UserId
 import de.p10r.infrastructure.AppOutgoingHttp
@@ -27,12 +26,11 @@ fun App(
     dynamoDbConfig.copy(http = AppOutgoingHttp(events, dynamoDbConfig.http)),
   )
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
-  val artistsRegistry = ArtistsRegistry(artistRepository)
   val userCommandHub = UserCommandHub(artistRepository, raClient)
 
   return ApiRoutes(
     processTelegramCommands = userCommandHub::process,
-    listAllArtists = artistsRegistry::list,
+    listAllArtists = artistRepository::findAll,
     secret = telegramConfig.secret,
     users = users,
     events
