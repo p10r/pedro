@@ -1,16 +1,33 @@
 package de.p10r.domain
 
 import de.p10r.UserId
+import de.p10r.adapters.driven.db.ArtistRepository
+import de.p10r.adapters.driven.ra.RAClient
+import de.p10r.adapters.driven.ra.RASlug
+import de.p10r.domain.UserCommand.FollowArtist
+import de.p10r.domain.UserCommand.ListArtists
 
-class UserCommandHub(val artistsRegistry: ArtistsRegistry) {
-  fun process(command: UserCommand): UserCommandResult = when (command) {
-    is UserCommand.FollowArtist -> {
-      artistsRegistry.follow(command.userId, command.artist)
-      UserCommandResult.AddedArtist
-    }
+class UserCommandHub(
+  val repository: ArtistRepository,
+  val raClient: RAClient
+) {
+  fun process(command: UserCommand): UserCommandResult {
+    return when (command) {
+      is FollowArtist -> {
+        val result = raClient.getArtistBy(RASlug(command.artist))
+          ?: return UserCommandResult.AddedArtist
 
-    is UserCommand.ListArtists -> {
-      UserCommandResult.Artists(artistsRegistry.list())
+        if (repository.findByName(result.name) != null)
+          return UserCommandResult.AddedArtist
+
+        repository.create(NewArtist(result.name))
+
+        UserCommandResult.AddedArtist
+      }
+
+      is ListArtists  -> {
+        UserCommandResult.Artists(repository.findAll())
+      }
     }
   }
 }

@@ -30,7 +30,7 @@ fun App(
   )
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
-  val userCommandHub = UserCommandHub(artistsRegistry)
+  val userCommandHub = UserCommandHub(artistRepository, raClient)
   //TODO remove events as last parameter
   val telegramClient = TelegramClient(telegramConfig, events)
 

@@ -43,12 +43,7 @@ class HubTests {
       NewArtist("Sinamin"),
     )
 
-    val hub = UserCommandHub(
-      ArtistsRegistry(
-        repository = ArtistRepository.new(existingArtists),
-        raClient = raClient
-      )
-    )
+    val hub = UserCommandHub(ArtistRepository.new(existingArtists), raClient)
 
     expectThat(hub.process(ListArtists))
       .isArtistsResult()
@@ -57,7 +52,7 @@ class HubTests {
 
   @Test
   fun `follows artist from resident advisor with user as follower`() {
-    val hub = UserCommandHub(ArtistsRegistry(ArtistRepository.new(), raClient))
+    val hub = UserCommandHub(ArtistRepository.new(), raClient)
 
     hub.process(FollowArtist(UserId(1), "justice"))
 
@@ -69,7 +64,7 @@ class HubTests {
   @Test
   fun `doesn't follow artist if already existing`() {
     val repository = ArtistRepository.new()
-    val hub = UserCommandHub(ArtistsRegistry(repository, raClient))
+    val hub = UserCommandHub(repository, raClient)
 
     assertEquals(0, repository.findAll().size)
 
