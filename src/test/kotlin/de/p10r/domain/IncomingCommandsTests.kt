@@ -1,5 +1,6 @@
 package de.p10r.domain
 
+import de.p10r.UserId
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.ra.RAArtist
 import de.p10r.adapters.driven.ra.RAArtistResponse
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.contains
 
-class ArtistsRegistryTests {
+class IncomingCommandsTests {
   val raClient = RAClient(
     raUri = Uri.of("http://resident-advisor"),
     http = { _: Request ->
@@ -45,24 +46,24 @@ class ArtistsRegistryTests {
   }
 
   @Test
-  fun `adds artist from resident advisor`() {
+  fun `follows artist from resident advisor with user as follower`() {
     val repository = ArtistRepository.new()
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
-    artistsRegistry.add("justice")
+    artistsRegistry.follow(UserId(1), "justice")
 
     expectThat(artistsRegistry.list().toNewArtists()).contains(NewArtist("Justice"))
   }
 
   @Test
-  fun `doesn't add artist if already existing`() {
+  fun `doesn't follow artist if already existing`() {
     val repository = ArtistRepository.new()
     val artistsRegistry = ArtistsRegistry(repository, raClient)
 
     assertEquals(0, artistsRegistry.list().size)
 
-    artistsRegistry.add("https://ra.co/dj/justice")
-    artistsRegistry.add("https://ra.co/dj/justice")
+    artistsRegistry.follow(UserId(1), "https://ra.co/dj/justice")
+    artistsRegistry.follow(UserId(1), "https://ra.co/dj/justice")
 
     assertEquals(1, artistsRegistry.list().size)
   }

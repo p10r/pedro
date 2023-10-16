@@ -1,5 +1,6 @@
 package de.p10r.domain
 
+import de.p10r.UserId
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.ra.RASlug
@@ -10,7 +11,7 @@ class ArtistsRegistry(
 ) {
   fun list(): List<Artist> = repository.findAll()
 
-  fun add(artist: String) {
+  fun follow(userId: UserId, artist: String) {
     val result = raClient.getArtistBy(RASlug(artist)) ?: return
 
     if (repository.findByName(result.name) != null) return

@@ -12,10 +12,10 @@ class IncomingTelegramRequestTests {
   @Test
   fun `maps to TelegramCommand`() {
     expectThat(incomingTelegramReqOf(UserId(1), "/add http://ra.co/dj/mom").toCommand())
-      .isEqualTo(AddArtist("mom"))
+      .isEqualTo(AddArtist(UserId(1), "mom"))
 
     expectThat(incomingTelegramReqOf(UserId(1), "/add mom").toCommand())
-      .isEqualTo(AddArtist("mom"))
+      .isEqualTo(AddArtist(UserId(1), "mom"))
 
     expectThat(incomingTelegramReqOf(UserId(1), "/list").toCommand())
       .isEqualTo(ListArtists)

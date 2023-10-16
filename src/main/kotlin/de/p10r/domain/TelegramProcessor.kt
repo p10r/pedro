@@ -1,9 +1,11 @@
 package de.p10r.domain
 
+import de.p10r.UserId
+
 class TelegramProcessor(val artistsRegistry: ArtistsRegistry) {
   fun process(command: TelegramCommand): TelegramCommandResult = when (command) {
     is TelegramCommand.AddArtist   -> {
-      artistsRegistry.add(command.artist)
+      artistsRegistry.follow(command.userId, command.artist)
       TelegramCommandResult.AddedArtist
     }
 
@@ -14,7 +16,7 @@ class TelegramProcessor(val artistsRegistry: ArtistsRegistry) {
 }
 
 sealed interface TelegramCommand {
-  data class AddArtist(val artist: String) : TelegramCommand
+  data class AddArtist(val userId: UserId, val artist: String) : TelegramCommand
   object ListArtists : TelegramCommand
 }
 

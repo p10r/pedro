@@ -28,7 +28,7 @@ data class IncomingTelegramRequest(val message: Message) {
         if (input.startsWith(baseUrl)) input.removePrefix(baseUrl)
         else input
 
-      return TelegramCommand.AddArtist(sanitized)
+      return TelegramCommand.AddArtist(userId, sanitized)
     }
 
     if (text.startsWith("/list"))
