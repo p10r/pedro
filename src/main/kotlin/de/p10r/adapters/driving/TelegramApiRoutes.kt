@@ -1,11 +1,11 @@
 package de.p10r.adapters.driving
 
-import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.domain.UserCommand
 import de.p10r.domain.UserCommandResult
 import de.p10r.domain.UserCommandResult.AddedArtist
 import de.p10r.domain.UserCommandResult.Artists
+import de.p10r.domain.UserId
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response

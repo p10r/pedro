@@ -5,6 +5,7 @@ import de.p10r.domain.Artist
 import de.p10r.domain.ArtistId
 import de.p10r.domain.NewArtist
 import de.p10r.domain.UserCommandResult
+import de.p10r.domain.UserId
 import strikt.api.Assertion
 import strikt.api.DescribeableBuilder
 import strikt.api.expectThat

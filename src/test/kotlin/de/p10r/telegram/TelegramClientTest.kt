@@ -1,6 +1,5 @@
 package de.p10r.telegram
 
-import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.OutgoingTelegramMessageError
 import de.p10r.adapters.driven.telegram.TelegramClient
 import de.p10r.adapters.driven.telegram.TelegramConfig
@@ -10,6 +9,7 @@ import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSe
 import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.adapters.driven.telegram.chatIdLens
 import de.p10r.adapters.driven.telegram.messageLens
+import de.p10r.domain.UserId
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

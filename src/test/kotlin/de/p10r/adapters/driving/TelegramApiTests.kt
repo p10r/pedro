@@ -1,10 +1,10 @@
 package de.p10r.adapters.driving
 
-import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
 import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.adapters.driving.IncomingTelegramRequest.Message
 import de.p10r.domain.UserCommandResult
+import de.p10r.domain.UserId
 import de.p10r.readTextFrom
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler

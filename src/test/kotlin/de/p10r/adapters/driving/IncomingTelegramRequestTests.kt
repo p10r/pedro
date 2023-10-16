@@ -1,8 +1,8 @@
 package de.p10r.adapters.driving
 
-import de.p10r.UserId
 import de.p10r.domain.UserCommand.FollowArtist
 import de.p10r.domain.UserCommand.ListArtists
+import de.p10r.domain.UserId
 import de.p10r.incomingTelegramReqOf
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -18,7 +18,7 @@ class IncomingTelegramRequestTests {
       .isEqualTo(FollowArtist(UserId(1), "mom"))
 
     expectThat(incomingTelegramReqOf(UserId(1), "/list").toCommand())
-      .isEqualTo(ListArtists)
+      .isEqualTo(ListArtists(UserId(1)))
 
     expectThat(incomingTelegramReqOf(UserId(1), "/idk").toCommand())
       .isEqualTo(null)

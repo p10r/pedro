@@ -1,6 +1,5 @@
 package de.p10r.domain
 
-import de.p10r.UserId
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.ra.RASlug
@@ -26,7 +25,7 @@ class UserCommandHub(
       }
 
       is ListArtists  -> {
-        UserCommandResult.Artists(repository.findAll())
+        UserCommandResult.Artists(repository.findAllFor(command.userId))
       }
     }
   }
@@ -34,7 +33,7 @@ class UserCommandHub(
 
 sealed interface UserCommand {
   data class FollowArtist(val userId: UserId, val artist: String) : UserCommand
-  object ListArtists : UserCommand
+  data class ListArtists(val userId: UserId) : UserCommand
 }
 
 sealed interface UserCommandResult {

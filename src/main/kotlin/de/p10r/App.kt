@@ -8,13 +8,12 @@ import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.ApiRoutes
 import de.p10r.domain.ArtistsRegistry
 import de.p10r.domain.UserCommandHub
+import de.p10r.domain.UserId
 import de.p10r.infrastructure.AppOutgoingHttp
 import de.p10r.infrastructure.Features
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.events.Events
-
-data class UserId(val value: Int)
 
 fun App(
   dynamoDbConfig: DynamoDbConfig,
@@ -29,7 +28,7 @@ fun App(
     dynamoDbConfig.copy(http = AppOutgoingHttp(events, dynamoDbConfig.http)),
   )
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
-  val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
+  val artistsRegistry = ArtistsRegistry(artistRepository)
   val userCommandHub = UserCommandHub(artistRepository, raClient)
   //TODO remove events as last parameter
   val telegramClient = TelegramClient(telegramConfig, events)

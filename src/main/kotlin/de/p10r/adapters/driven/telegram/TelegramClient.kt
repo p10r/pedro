@@ -1,6 +1,6 @@
 package de.p10r.adapters.driven.telegram
 
-import de.p10r.UserId
+import de.p10r.domain.UserId
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request

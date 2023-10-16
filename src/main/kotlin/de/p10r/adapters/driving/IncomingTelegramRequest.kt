@@ -1,7 +1,7 @@
 package de.p10r.adapters.driving
 
-import de.p10r.UserId
 import de.p10r.domain.UserCommand
+import de.p10r.domain.UserId
 
 data class IncomingTelegramRequest(val message: Message) {
   val userId = UserId(message.from.id)
@@ -32,7 +32,7 @@ data class IncomingTelegramRequest(val message: Message) {
     }
 
     if (text.startsWith("/list"))
-      return UserCommand.ListArtists
+      return UserCommand.ListArtists(userId)
 
     return null
   }

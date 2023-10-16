@@ -1,6 +1,5 @@
 package de.p10r.domain
 
-import de.p10r.UserId
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.ra.RAArtist
 import de.p10r.adapters.driven.ra.RAArtistResponse
@@ -16,7 +15,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEmpty
@@ -45,18 +43,18 @@ class HubTests {
 
     val hub = UserCommandHub(ArtistRepository.new(existingArtists), raClient)
 
-    expectThat(hub.process(ListArtists))
+    expectThat(hub.process(ListArtists(UserId(1))))
       .isArtistsResult()
       .containsExactlyInAnyOrderIgnoringIds(existingArtists.map { Artist.of(it) })
   }
 
   @Test
-  fun `follows artist from resident advisor with user as follower`() {
+  fun `imports artist form RA with user as follower`() {
     val hub = UserCommandHub(ArtistRepository.new(), raClient)
 
     hub.process(FollowArtist(UserId(1), "justice"))
 
-    expectThat(hub.process(ListArtists))
+    expectThat(hub.process(ListArtists(UserId(1))))
       .isArtistsResult()
       .containsExactlyInAnyOrderIgnoringIds(listOf(Artist(ArtistId.new(), "Justice")))
   }
@@ -66,17 +64,18 @@ class HubTests {
     val repository = ArtistRepository.new()
     val hub = UserCommandHub(repository, raClient)
 
-    assertEquals(0, repository.findAll().size)
+    expectThat(repository.findAll()).isEmpty()
 
-    expectThat(hub.process(ListArtists))
+    expectThat(hub.process(ListArtists(UserId(1))))
       .isArtistsResult()
       .isEmpty()
 
     hub.process(FollowArtist(UserId(1), "justice"))
     hub.process(FollowArtist(UserId(1), "justice"))
 
-    expectThat(hub.process(ListArtists))
+    expectThat(hub.process(ListArtists(UserId(1))))
       .isArtistsResult()
       .containsExactlyInAnyOrderIgnoringIds(listOf(Artist(ArtistId.new(), "Justice")))
   }
+
 }

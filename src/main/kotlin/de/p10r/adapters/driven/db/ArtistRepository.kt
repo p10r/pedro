@@ -3,6 +3,7 @@ package de.p10r.adapters.driven.db
 import de.p10r.domain.Artist
 import de.p10r.domain.ArtistId
 import de.p10r.domain.NewArtist
+import de.p10r.domain.UserId
 import org.http4k.aws.AwsCredentials
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.dynamodb.DynamoDb
@@ -39,7 +40,13 @@ class ArtistRepository(config: DynamoDbConfig) {
       hashKeyAttribute = Attribute.string().required("id")
     )
 
-  fun findAll(): List<Artist> =
+  fun findAllFor(userId: UserId): List<Artist> =
+    table.primaryIndex()
+      .scan()
+      .toList()
+      .map { entity -> Artist(ArtistId.of(entity.id), entity.name) }
+
+  fun findAll() =
     table.primaryIndex()
       .scan()
       .toList()
