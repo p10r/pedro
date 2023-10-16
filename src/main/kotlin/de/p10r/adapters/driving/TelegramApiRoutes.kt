@@ -2,10 +2,10 @@ package de.p10r.adapters.driving
 
 import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig
-import de.p10r.domain.TelegramCommand
-import de.p10r.domain.TelegramCommandResult
-import de.p10r.domain.TelegramCommandResult.AddedArtist
-import de.p10r.domain.TelegramCommandResult.Artists
+import de.p10r.domain.UserCommand
+import de.p10r.domain.UserCommandResult
+import de.p10r.domain.UserCommandResult.AddedArtist
+import de.p10r.domain.UserCommandResult.Artists
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -18,7 +18,7 @@ import org.http4k.core.with
 fun TelegramApi(
   users: List<UserId>,
   secret: TelegramConfig.IncomingTelegramRequestSecret,
-  process: (TelegramCommand) -> TelegramCommandResult
+  process: (UserCommand) -> UserCommandResult
 ) = TelegramSecurityFilter(users, secret).then { req ->
   val payload = telegramReq(req)
 

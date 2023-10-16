@@ -4,7 +4,7 @@ import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig.Companion.TELEGRAM_SECRET_HEADER
 import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSecret
 import de.p10r.adapters.driving.IncomingTelegramRequest.Message
-import de.p10r.domain.TelegramCommandResult
+import de.p10r.domain.UserCommandResult
 import de.p10r.readTextFrom
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
@@ -76,7 +76,7 @@ class TelegramApiTests {
     val api = TelegramApi(
       listOf(UserId(1)),
       secret = IncomingTelegramRequestSecret("secret")
-    ) { TelegramCommandResult.AddedArtist }
+    ) { UserCommandResult.AddedArtist }
 
     expectThat(api.postTelegramMessage(text = "/idk asd"))
       .isEqualTo(Response(BAD_REQUEST))

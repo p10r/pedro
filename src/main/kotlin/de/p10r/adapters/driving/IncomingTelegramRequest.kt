@@ -1,7 +1,7 @@
 package de.p10r.adapters.driving
 
 import de.p10r.UserId
-import de.p10r.domain.TelegramCommand
+import de.p10r.domain.UserCommand
 
 data class IncomingTelegramRequest(val message: Message) {
   val userId = UserId(message.from.id)
@@ -15,7 +15,7 @@ data class IncomingTelegramRequest(val message: Message) {
     data class Entity(val type: String)
   }
 
-  fun toCommand(): TelegramCommand? {
+  fun toCommand(): UserCommand? {
     val text = message.text
 
     if (text.startsWith("/add")) {
@@ -28,11 +28,11 @@ data class IncomingTelegramRequest(val message: Message) {
         if (input.startsWith(baseUrl)) input.removePrefix(baseUrl)
         else input
 
-      return TelegramCommand.AddArtist(userId, sanitized)
+      return UserCommand.FollowArtist(userId, sanitized)
     }
 
     if (text.startsWith("/list"))
-      return TelegramCommand.ListArtists
+      return UserCommand.ListArtists
 
     return null
   }

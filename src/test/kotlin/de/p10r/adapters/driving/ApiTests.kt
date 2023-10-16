@@ -4,7 +4,7 @@ import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.IncomingTelegramRequest.Message
 import de.p10r.domain.Artist
-import de.p10r.domain.TelegramCommandResult
+import de.p10r.domain.UserCommandResult
 import de.p10r.infrastructure.UncaughtExceptionEvent
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -49,7 +49,7 @@ class ApiTests {
     listAllArtists: () -> List<Artist> = { emptyList() },
     users: List<UserId> = listOf(UserId(1)),
   ) = ApiRoutes(
-    processTelegramCommands = { TelegramCommandResult.AddedArtist },
+    processTelegramCommands = { UserCommandResult.AddedArtist },
     listAllArtists = listAllArtists,
     secret = TelegramConfig.IncomingTelegramRequestSecret("w/e"),
     users = users,

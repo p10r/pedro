@@ -7,7 +7,7 @@ import de.p10r.adapters.driven.telegram.TelegramClient
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.ApiRoutes
 import de.p10r.domain.ArtistsRegistry
-import de.p10r.domain.TelegramProcessor
+import de.p10r.domain.UserCommandProcessor
 import de.p10r.infrastructure.AppOutgoingHttp
 import de.p10r.infrastructure.Features
 import org.http4k.core.HttpHandler
@@ -30,13 +30,13 @@ fun App(
   )
   val raClient = RAClient(raUri, AppOutgoingHttp(events, raHttp))
   val artistsRegistry = ArtistsRegistry(artistRepository, raClient)
-  val telegramProcessor = TelegramProcessor(artistsRegistry)
+  val userCommandProcessor = UserCommandProcessor(artistsRegistry)
   //TODO remove events as last parameter
   val telegramClient = TelegramClient(telegramConfig, events)
 
 
   return ApiRoutes(
-    processTelegramCommands = telegramProcessor::process,
+    processTelegramCommands = userCommandProcessor::process,
     listAllArtists = artistsRegistry::list,
     secret = telegramConfig.secret,
     users = users,

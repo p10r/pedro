@@ -3,8 +3,8 @@ package de.p10r.adapters.driving
 import de.p10r.UserId
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.domain.Artist
-import de.p10r.domain.TelegramCommand
-import de.p10r.domain.TelegramCommandResult
+import de.p10r.domain.UserCommand
+import de.p10r.domain.UserCommandResult
 import de.p10r.infrastructure.AppIncomingHttp
 import de.p10r.infrastructure.UncaughtExceptionEvent
 import org.http4k.core.Body
@@ -27,7 +27,7 @@ fun List<Artist>.toResponse() = map { ArtistResponse(it.name) }
 val telegramReq = Body.auto<IncomingTelegramRequest>().toLens()
 
 fun ApiRoutes(
-  processTelegramCommands: (TelegramCommand) -> TelegramCommandResult,
+  processTelegramCommands: (UserCommand) -> UserCommandResult,
   listAllArtists: () -> List<Artist>,
   secret: TelegramConfig.IncomingTelegramRequestSecret,
   users: List<UserId>,
