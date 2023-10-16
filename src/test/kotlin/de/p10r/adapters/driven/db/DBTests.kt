@@ -1,10 +1,10 @@
 package de.p10r.adapters.driven.db
 
 import de.p10r.containsExactlyInAnyOrderIgnoringIds
-import de.p10r.domain.Artist
-import de.p10r.domain.ArtistId
-import de.p10r.domain.NewArtist
-import de.p10r.domain.UserId
+import de.p10r.domain.models.Artist
+import de.p10r.domain.models.ArtistId
+import de.p10r.domain.models.NewArtist
+import de.p10r.domain.models.UserId
 import de.p10r.fixtures.new
 import de.p10r.isEqualToIgnoringId
 import org.junit.jupiter.api.Test

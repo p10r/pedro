@@ -4,11 +4,11 @@ import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.ArtistResponse
 import de.p10r.adapters.driving.artists
 import de.p10r.adapters.driving.telegramReq
-import de.p10r.domain.ArtistName
-import de.p10r.domain.UserCommand
 import de.p10r.domain.UserCommandHub
-import de.p10r.domain.UserCommandResult
-import de.p10r.domain.UserId
+import de.p10r.domain.models.ArtistName
+import de.p10r.domain.models.UserCommand
+import de.p10r.domain.models.UserCommandResult
+import de.p10r.domain.models.UserId
 import de.p10r.incomingTelegramReqOf
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST

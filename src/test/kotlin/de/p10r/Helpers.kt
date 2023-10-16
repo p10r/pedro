@@ -1,10 +1,10 @@
 package de.p10r
 
 import de.p10r.adapters.driving.IncomingTelegramRequest
-import de.p10r.domain.Artist
-import de.p10r.domain.ArtistId
-import de.p10r.domain.UserCommandResult
-import de.p10r.domain.UserId
+import de.p10r.domain.models.Artist
+import de.p10r.domain.models.ArtistId
+import de.p10r.domain.models.UserCommandResult
+import de.p10r.domain.models.UserId
 import strikt.api.Assertion
 import strikt.api.DescribeableBuilder
 import strikt.api.expectThat

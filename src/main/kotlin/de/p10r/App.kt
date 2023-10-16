@@ -6,7 +6,7 @@ import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driving.ApiRoutes
 import de.p10r.domain.UserCommandHub
-import de.p10r.domain.UserId
+import de.p10r.domain.models.UserId
 import de.p10r.infrastructure.AppOutgoingHttp
 import de.p10r.infrastructure.Features
 import org.http4k.core.HttpHandler

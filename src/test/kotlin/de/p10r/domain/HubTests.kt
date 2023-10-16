@@ -6,8 +6,13 @@ import de.p10r.adapters.driven.ra.RAArtistResponse
 import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.ra.RASlug
 import de.p10r.containsExactlyInAnyOrderIgnoringIds
-import de.p10r.domain.UserCommand.FollowArtist
-import de.p10r.domain.UserCommand.ListArtists
+import de.p10r.domain.models.Artist
+import de.p10r.domain.models.ArtistId
+import de.p10r.domain.models.ArtistName
+import de.p10r.domain.models.NewArtist
+import de.p10r.domain.models.UserCommand.FollowArtist
+import de.p10r.domain.models.UserCommand.ListArtists
+import de.p10r.domain.models.UserId
 import de.p10r.fixtures.DomainTelegramUser
 import de.p10r.fixtures.FakeRAServer
 import de.p10r.fixtures.new

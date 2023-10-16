@@ -1,10 +1,10 @@
 package de.p10r.adapters.driving
 
 import de.p10r.adapters.driven.telegram.TelegramConfig
-import de.p10r.domain.Artist
-import de.p10r.domain.UserCommand
-import de.p10r.domain.UserCommandResult
-import de.p10r.domain.UserId
+import de.p10r.domain.models.Artist
+import de.p10r.domain.models.UserCommand
+import de.p10r.domain.models.UserCommandResult
+import de.p10r.domain.models.UserId
 import de.p10r.infrastructure.AppIncomingHttp
 import de.p10r.infrastructure.UncaughtExceptionEvent
 import org.http4k.core.Body

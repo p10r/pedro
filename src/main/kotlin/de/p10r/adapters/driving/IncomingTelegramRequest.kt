@@ -1,8 +1,8 @@
 package de.p10r.adapters.driving
 
-import de.p10r.domain.ArtistName
-import de.p10r.domain.UserCommand
-import de.p10r.domain.UserId
+import de.p10r.domain.models.ArtistName
+import de.p10r.domain.models.UserCommand
+import de.p10r.domain.models.UserId
 
 data class IncomingTelegramRequest(val message: Message) {
   val userId = UserId(message.from.id)

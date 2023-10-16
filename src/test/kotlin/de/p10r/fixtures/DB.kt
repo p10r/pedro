@@ -2,7 +2,7 @@ package de.p10r.fixtures
 
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.db.DynamoDbConfig
-import de.p10r.domain.NewArtist
+import de.p10r.domain.models.NewArtist
 import org.http4k.aws.AwsCredentials
 import org.http4k.connect.amazon.dynamodb.DynamoDb
 import org.http4k.connect.amazon.dynamodb.FakeDynamoDb

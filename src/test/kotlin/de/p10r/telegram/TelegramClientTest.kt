@@ -9,7 +9,7 @@ import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSe
 import de.p10r.adapters.driven.telegram.TelegramMessage
 import de.p10r.adapters.driven.telegram.chatIdLens
 import de.p10r.adapters.driven.telegram.messageLens
-import de.p10r.domain.UserId
+import de.p10r.domain.models.UserId
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

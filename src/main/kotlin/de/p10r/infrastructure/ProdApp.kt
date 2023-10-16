@@ -6,7 +6,7 @@ import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driven.telegram.TelegramConfig.BotId
 import de.p10r.adapters.driven.telegram.TelegramConfig.BotSecret
 import de.p10r.adapters.driven.telegram.TelegramConfig.IncomingTelegramRequestSecret
-import de.p10r.domain.UserId
+import de.p10r.domain.models.UserId
 import de.p10r.infrastructure.PedroSettings.DYNAMO_ID
 import de.p10r.infrastructure.PedroSettings.DYNAMO_SECRET
 import de.p10r.infrastructure.PedroSettings.DYNAMO_URI

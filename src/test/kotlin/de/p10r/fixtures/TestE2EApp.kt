@@ -4,7 +4,7 @@ import de.p10r.adapters.driven.ra.RAArtistResponse
 import de.p10r.adapters.driven.ra.RASlug
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driven.telegram.TelegramMessage
-import de.p10r.domain.UserId
+import de.p10r.domain.models.UserId
 import de.p10r.infrastructure.PedroSettings.DYNAMO_ID
 import de.p10r.infrastructure.PedroSettings.DYNAMO_SECRET
 import de.p10r.infrastructure.PedroSettings.DYNAMO_URI

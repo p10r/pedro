@@ -3,8 +3,11 @@ package de.p10r.domain
 import de.p10r.adapters.driven.db.ArtistRepository
 import de.p10r.adapters.driven.ra.RAClient
 import de.p10r.adapters.driven.ra.RASlug
-import de.p10r.domain.UserCommand.FollowArtist
-import de.p10r.domain.UserCommand.ListArtists
+import de.p10r.domain.models.NewArtist
+import de.p10r.domain.models.UserCommand
+import de.p10r.domain.models.UserCommand.FollowArtist
+import de.p10r.domain.models.UserCommand.ListArtists
+import de.p10r.domain.models.UserCommandResult
 
 class UserCommandHub(
   val repository: ArtistRepository,
@@ -27,25 +30,3 @@ class UserCommandHub(
   }
 }
 
-data class ArtistName private constructor(val value: String) {
-  companion object {
-    fun of(input: String): ArtistName {
-      val baseUrl = "http://ra.co/dj/"
-      val sanitized =
-        if (input.startsWith(baseUrl)) input.removePrefix(baseUrl)
-        else input
-
-      return ArtistName(sanitized)
-    }
-  }
-}
-
-sealed interface UserCommand {
-  data class FollowArtist(val userId: UserId, val artist: ArtistName) : UserCommand
-  data class ListArtists(val userId: UserId) : UserCommand
-}
-
-sealed interface UserCommandResult {
-  object AddedArtist : UserCommandResult
-  data class Artists(val artists: List<Artist>) : UserCommandResult
-}

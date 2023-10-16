@@ -1,9 +1,9 @@
 package de.p10r.adapters.driving
 
-import de.p10r.domain.ArtistName
-import de.p10r.domain.UserCommand.FollowArtist
-import de.p10r.domain.UserCommand.ListArtists
-import de.p10r.domain.UserId
+import de.p10r.domain.models.ArtistName
+import de.p10r.domain.models.UserCommand.FollowArtist
+import de.p10r.domain.models.UserCommand.ListArtists
+import de.p10r.domain.models.UserId
 import de.p10r.incomingTelegramReqOf
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat

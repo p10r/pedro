@@ -5,7 +5,7 @@ import de.p10r.adapters.driven.ra.RAArtistResponse
 import de.p10r.adapters.driven.ra.RASlug
 import de.p10r.adapters.driven.telegram.TelegramConfig
 import de.p10r.adapters.driven.telegram.TelegramMessage
-import de.p10r.domain.UserId
+import de.p10r.domain.models.UserId
 import de.p10r.fixtures.HttpTelegramUser
 import de.p10r.fixtures.TestE2EApp
 import de.p10r.scenarios.TelegramUserScenarios
