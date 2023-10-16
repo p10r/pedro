@@ -5,7 +5,11 @@ import java.util.*
 data class Artist(
   val id: ArtistId,
   val name: String,
-)
+) {
+  companion object {
+    fun of(newArtist: NewArtist) = Artist(ArtistId.new(), newArtist.name)
+  }
+}
 
 data class NewArtist(
   val name: String

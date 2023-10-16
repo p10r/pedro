@@ -2,7 +2,7 @@ package de.p10r.domain
 
 import de.p10r.UserId
 
-class UserCommandProcessor(val artistsRegistry: ArtistsRegistry) {
+class UserCommandHub(val artistsRegistry: ArtistsRegistry) {
   fun process(command: UserCommand): UserCommandResult = when (command) {
     is UserCommand.FollowArtist -> {
       artistsRegistry.follow(command.userId, command.artist)
