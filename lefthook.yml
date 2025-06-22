@@ -3,7 +3,10 @@ pre-commit:
   commands:
     test:
       run: go test ./...
+      glob: "*.go"
     golangci-lint:
       run: golangci-lint run
+      glob: "*.go"
     nil-away:
       run: nilaway ./...
+      glob: "*.go"
