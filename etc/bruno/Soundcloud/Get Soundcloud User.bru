@@ -1,0 +1,19 @@
+meta {
+  name: Get Soundcloud User
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://api.soundcloud.com/resolve?url=https://soundcloud.com/bizzarro_universe
+  body: none
+  auth: inherit
+}
+
+params:query {
+  url: https://soundcloud.com/bizzarro_universe
+}
+
+headers {
+  Authorization: OAuth 2-304915--7VY141rpcbJ5IejahvJHHVP
+}

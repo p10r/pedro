@@ -1,0 +1,21 @@
+meta {
+  name: Create OAuth Token
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://secure.soundcloud.com/oauth/token
+  body: formUrlEncoded
+  auth: inherit
+}
+
+headers {
+  accept: application/json; charset=utf-8
+  Content-Type: application/x-www-form-urlencoded
+  Authorization: Basic {{base64-client-id-secret}}
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+}
