@@ -55,6 +55,7 @@ func (c *client) Authorize() (authRes, error) {
 	if err != nil {
 		return authRes{}, fmt.Errorf("soundcloud api: error executing req: %w, url: %v", err, url)
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode == 401 {
 		return authRes{}, newUnauthorizedError("POST", url)
@@ -63,8 +64,6 @@ func (c *client) Authorize() (authRes, error) {
 	if resp.StatusCode != 200 {
 		return authRes{}, fmt.Errorf("soundcloud api: got %v when authorizing, url: %v", resp.Status, url)
 	}
-
-	defer resp.Body.Close()
 
 	var authResponse authRes
 	err = json.NewDecoder(resp.Body).Decode(&authResponse)
