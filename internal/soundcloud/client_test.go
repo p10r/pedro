@@ -13,8 +13,13 @@ func TestSoundcloud(t *testing.T) {
 		t.Skip("set SOUNDCLOUD_API_SECRET to run this test")
 	}
 
+	const (
+		authUrl = "https://secure.soundcloud.com/"
+		apiUrl  = "https://api.soundcloud.com/"
+	)
+
 	t.Run("fetches auth token", func(t *testing.T) {
-		c := newClient("https://secure.soundcloud.com/", secret)
+		c := mustNewClient(t, authUrl, apiUrl, secret)
 
 		res, err := c.Authorize()
 
@@ -27,7 +32,9 @@ func TestSoundcloud(t *testing.T) {
 	})
 
 	t.Run("fetches artist by url", func(t *testing.T) {
+		//c := mustNewClient(t, authUrl, apiUrl, secret)
 
+		//res, err := c.ArtistByUrl("https://soundcloud.com/bizzarro_universe")
 	})
 
 	t.Run("fetches artist by urn", func(t *testing.T) {
@@ -39,7 +46,8 @@ func TestSoundcloud(t *testing.T) {
 	})
 
 	t.Run("returns err when unauthorized", func(t *testing.T) {
-		c := newClient("https://secure.soundcloud.com/", "wahhhh=")
+		c := mustNewClient(t, authUrl, apiUrl, "wahhhh=")
+
 		_, err := c.Authorize()
 
 		var unAuthedErr *unauthorizedErr
@@ -48,4 +56,16 @@ func TestSoundcloud(t *testing.T) {
 		}
 	})
 
+	t.Run("returns err on invalid input urls", func(t *testing.T) {
+
+	})
+
+}
+
+func mustNewClient(t *testing.T, authUrl, apiUrl, secret string) *client {
+	c, err := newClient(authUrl, apiUrl, secret)
+	if err != nil {
+		t.Fatal("could not create client")
+	}
+	return c
 }

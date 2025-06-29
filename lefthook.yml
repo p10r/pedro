@@ -8,5 +8,5 @@ pre-commit:
       run: golangci-lint run
       glob: "*.go"
     nil-away:
-      run: nilaway ./...
+      run: nilaway -include-pkgs="github.com/p10r/pedro" ./...
       glob: "*.go"
