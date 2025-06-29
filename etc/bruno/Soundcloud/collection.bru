@@ -1,0 +1,18 @@
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: client_credentials
+  access_token_url: https://secure.soundcloud.com/oauth/token
+  refresh_token_url: 
+  client_id: {{client-id}}
+  client_secret: {{client-secret}}
+  scope: 
+  credentials_placement: basic_auth_header
+  credentials_id: credentials
+  token_placement: header
+  token_header_prefix: Bearer
+  auto_fetch_token: true
+  auto_refresh_token: false
+}
