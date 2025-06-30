@@ -1,111 +1,130 @@
 package soundcloud
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/p10r/pedro/httputil"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
 	url2 "net/url"
 	"strings"
 )
 
 type client struct {
-	authUrl      *url2.URL
-	apiUrl       *url2.URL
-	base64Secret string
-	client       *http.Client
+	apiUrl *url2.URL
+	client *http.Client
 }
 
-func newClient(authUrl, apiUrl string, base64Secret string) (*client, error) {
-	authBase, err := url2.Parse(strings.TrimSuffix(authUrl, "/"))
-	if err != nil {
-		return nil, fmt.Errorf("soundcloud api: cannot parse authUrl %v, err: %w", authUrl, err)
+func newClient(conf oAuthConfig, apiUrl string) (*client, error) {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, httputil.NewDefaultClient())
+
+	config := &clientcredentials.Config{
+		ClientID:       conf.clientId,
+		ClientSecret:   conf.clientSecret,
+		TokenURL:       conf.tokenUrl,
+		Scopes:         nil,
+		EndpointParams: nil,
+		AuthStyle:      oauth2.AuthStyleAutoDetect,
 	}
 
-	apiBase, err := url2.Parse(strings.TrimSuffix(apiUrl, "/"))
+	authedClient := config.Client(ctx)
+
+	baseUrl, err := url2.Parse(strings.TrimSuffix(apiUrl, "/"))
 	if err != nil {
-		return nil, fmt.Errorf("soundcloud api: cannot parse apiUrl %v, err: %w", apiUrl, err)
+		return nil, fmt.Errorf("soundcloud.client: cannot parse apiUrl %v, err: %w", apiUrl, err)
 	}
 
 	return &client{
-		authUrl:      authBase,
-		apiUrl:       apiBase,
-		base64Secret: base64Secret,
-		client:       httputil.NewDefaultClient(),
+		apiUrl: baseUrl,
+		client: authedClient,
 	}, nil
 }
 
-type unauthorizedErr struct {
-	method string
-	url    string
+type resolveArtistRes struct {
+	Username string `json:"username"`
+	Urn      string `json:"urn"`
 }
 
-func newUnauthorizedError(method, url string) *unauthorizedErr {
-	return &unauthorizedErr{method: method, url: url}
-}
+func (c *client) ArtistByUrl(url string) (resolveArtistRes, error) {
+	params := url2.Values{}
+	params.Add("url", url)
 
-func (*unauthorizedErr) Error() string {
-	return "Unauthorized"
-}
-
-type authRes struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
-	Scope        string `json:"scope"`
-}
-
-func (c *client) Authorize() (authRes, error) {
-	var data = strings.NewReader(`grant_type=client_credentials`)
-	c.authUrl.Path += "/oauth/token"
-
-	authUrl := c.authUrl.String()
-	req, err := http.NewRequest("POST", authUrl, data)
+	apiUrl, err := url2.Parse("https://api.soundcloud.com/resolve")
 	if err != nil {
-		return authRes{}, fmt.Errorf("soundcloud api: unexpected error: %w", err)
+		return resolveArtistRes{}, fmt.Errorf("soundcloud.client: Cannot parse: %w", err)
+	}
+	apiUrl.RawQuery = params.Encode()
+
+	req, err := http.NewRequest("GET", apiUrl.String(), nil)
+	if err != nil {
+		return resolveArtistRes{}, fmt.Errorf("soundcloud.client: unexpected error: %w", err)
 	}
 
 	req.Header.Set("accept", "application/json; charset=utf-8")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Basic "+c.base64Secret)
 
 	res, err := c.client.Do(req)
 	if err != nil {
-		return authRes{}, fmt.Errorf("soundcloud api: error executing req: %w, url: %v", err, authUrl)
+		return resolveArtistRes{}, fmt.Errorf("soundcloud.client: error executing req: %w", err)
 	}
 	//nolint:errcheck
 	defer res.Body.Close()
 
-	if res.StatusCode == 401 {
-		return authRes{}, newUnauthorizedError("POST", authUrl)
-	}
-
 	if res.StatusCode != 200 {
-		return authRes{}, fmt.Errorf("soundcloud api: got %v when authorizing, url: %v", res.Status, authUrl)
+		return resolveArtistRes{}, fmt.Errorf("status code is %v", res.Status)
 	}
 
-	var authResponse authRes
-	err = json.NewDecoder(res.Body).Decode(&authResponse)
+	var artist resolveArtistRes
+	err = json.NewDecoder(res.Body).Decode(&artist)
 	if err != nil {
-		return authRes{}, fmt.Errorf("soundcloud api: error when parsing json: %w, %v", err, authUrl)
+		return resolveArtistRes{}, fmt.Errorf("soundcloud.client: error when parsing json: %w", err)
 	}
 
-	return authResponse, nil
+	return artist, nil
 }
 
-func (c *client) ArtistByUrl(url string, oAuthToken string) (string, error) {
-	params := url2.Values{}
-	params.Add("url", url)
-	c.apiUrl.RawQuery = params.Encode()
+type artistByUrnRes struct {
+	Id       int    `json:"id"`
+	Urn      string `json:"urn"`
+	Username string `json:"username"`
+}
 
-	req, err := http.NewRequest("GET", c.apiUrl.String(), nil)
+func (c *client) ArtistByUrn(urn string) (artistByUrnRes, error) {
+	fullPath, err := url2.JoinPath("https://api.soundcloud.com/users/", url2.PathEscape(urn))
 	if err != nil {
-		return "", fmt.Errorf("soundcloud api: unexpected error: %w", err)
+		return artistByUrnRes{}, fmt.Errorf("soundcloud.client: cannot parse urn %v: %w", fullPath, err)
+	}
+
+	apiUrl, err := url2.Parse(fullPath)
+	if err != nil {
+		return artistByUrnRes{}, fmt.Errorf("soundcloud.client: cannot parse url %v: %w", fullPath, err)
+	}
+
+	req, err := http.NewRequest("GET", apiUrl.String(), nil)
+	if err != nil {
+		return artistByUrnRes{}, fmt.Errorf("soundcloud.client: unexpected error: %w", err)
 	}
 
 	req.Header.Set("accept", "application/json; charset=utf-8")
-	req.Header.Set("Authorization", "OAuth "+oAuthToken)
 
-	panic("")
+	res, err := c.client.Do(req)
+	if err != nil {
+		return artistByUrnRes{}, fmt.Errorf("soundcloud.client: error executing req: %w", err)
+	}
+	//nolint:errcheck
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return artistByUrnRes{}, fmt.Errorf("status code is %v", res.Status)
+	}
+
+	var artist artistByUrnRes
+	err = json.NewDecoder(res.Body).Decode(&artist)
+	if err != nil {
+		return artistByUrnRes{}, fmt.Errorf("soundcloud.client: error when parsing json: %w", err)
+	}
+
+	return artist, nil
 }

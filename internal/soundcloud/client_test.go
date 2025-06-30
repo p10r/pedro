@@ -1,71 +1,55 @@
 package soundcloud
 
 import (
-	"errors"
 	"github.com/alecthomas/assert/v2"
 	"os"
 	"testing"
 )
 
-func TestSoundcloud(t *testing.T) {
-	secret := os.Getenv("SOUNDCLOUD_API_SECRET")
-	if secret == "" {
-		t.Skip("set SOUNDCLOUD_API_SECRET to run this test")
+func TestProdSoundcloud(t *testing.T) {
+	clientId := os.Getenv("SOUNDCLOUD_CLIENT_ID")
+	clientSecret := os.Getenv("SOUNDCLOUD_CLIENT_SECRET")
+	// This is provided via env, since it doesn't seem to be publicly exposed by SoundCloud, so this adheres to it.
+	exampleArtistUrn := os.Getenv("SOUNDCLOUD_ARTIST_URN")
+	if clientSecret == "" || clientId == "" || exampleArtistUrn == "" {
+		t.Skip("set SOUNDCLOUD_CLIENT_SECRET, SOUNDCLOUD_CLIENT_ID and SOUNDCLOUD_ARTIST_URN to run this test")
 	}
 
 	const (
-		authUrl = "https://secure.soundcloud.com/"
-		apiUrl  = "https://api.soundcloud.com/"
+		tokenUrl = "https://secure.soundcloud.com/oauth/token"
+		apiUrl   = "https://api.soundcloud.com/"
 	)
 
-	t.Run("fetches auth token", func(t *testing.T) {
-		c := mustNewClient(t, authUrl, apiUrl, secret)
-
-		res, err := c.Authorize()
-
-		assert.NoError(t, err)
-		assert.NotZero(t, res.AccessToken, "Did not expect zero value for AccessToken")
-		assert.NotZero(t, res.TokenType, "Did not expect zero value for TokenType")
-		assert.NotZero(t, res.ExpiresIn, "Did not expect zero value for ExpiresIn")
-		assert.NotZero(t, res.RefreshToken, "Did not expect zero value for RefreshToken")
-		assert.Zero(t, res.Scope)
-	})
-
 	t.Run("fetches artist by url", func(t *testing.T) {
-		//c := mustNewClient(t, authUrl, apiUrl, secret)
+		c := mustNewClient(t, tokenUrl, apiUrl, clientId, clientSecret)
 
-		//res, err := c.ArtistByUrl("https://soundcloud.com/bizzarro_universe")
+		res, err := c.ArtistByUrl("https://soundcloud.com/bizzarro_universe")
+		assert.NoError(t, err)
+		assert.Equal(t, "Bizzarro Universe", res.Username)
 	})
 
 	t.Run("fetches artist by urn", func(t *testing.T) {
+		c := mustNewClient(t, tokenUrl, apiUrl, clientId, clientSecret)
 
-	})
-
-	t.Run("err on outdated OAuth token", func(t *testing.T) {
-
-	})
-
-	t.Run("returns err when unauthorized", func(t *testing.T) {
-		c := mustNewClient(t, authUrl, apiUrl, "wahhhh=")
-
-		_, err := c.Authorize()
-
-		var unAuthedErr *unauthorizedErr
-		if !errors.As(err, &unAuthedErr) {
-			t.Fatal()
-		}
+		res, err := c.ArtistByUrl("https://soundcloud.com/bizzarro_universe")
+		assert.NoError(t, err)
+		assert.Equal(t, "Bizzarro Universe", res.Username)
 	})
 
 	t.Run("returns err on invalid input urls", func(t *testing.T) {
 
 	})
-
 }
 
-func mustNewClient(t *testing.T, authUrl, apiUrl, secret string) *client {
-	c, err := newClient(authUrl, apiUrl, secret)
+func mustNewClient(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *client {
+	conf, err := newOAuthConfig(clientId, clientSecret, tokenUrl)
 	if err != nil {
-		t.Fatal("could not create client")
+		t.Fatal("could not create oauth conf %w", err)
+	}
+
+	c, err := newClient(conf, apiUrl)
+	if err != nil {
+		t.Fatal("could not create client %w", err)
 	}
 	return c
 }
