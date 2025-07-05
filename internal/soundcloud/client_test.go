@@ -31,14 +31,11 @@ func TestProdSoundcloud(t *testing.T) {
 	t.Run("fetches artist by urn", func(t *testing.T) {
 		c := mustNewClient(t, tokenUrl, apiUrl, clientId, clientSecret)
 
-		res, err := c.ArtistByUrl("https://soundcloud.com/bizzarro_universe")
+		res, err := c.ArtistByUrn(exampleArtistUrn)
 		assert.NoError(t, err)
 		assert.Equal(t, "Bizzarro Universe", res.Username)
 	})
 
-	t.Run("returns err on invalid input urls", func(t *testing.T) {
-
-	})
 }
 
 func mustNewClient(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *client {
