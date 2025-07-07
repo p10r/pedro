@@ -10,14 +10,20 @@ import (
 	"net/http"
 	url2 "net/url"
 	"strings"
+	"testing"
 )
 
-type client struct {
+const (
+	TokenUrl = "https://secure.soundcloud.com/oauth/token"
+	ApiUrl   = "https://api.soundcloud.com/"
+)
+
+type Client struct {
 	apiUrl *url2.URL
 	client *http.Client
 }
 
-func newClient(conf oAuthConfig, apiUrl string) (*client, error) {
+func NewClient(conf oAuthConfig, apiUrl string) (*Client, error) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, httputil.NewDefaultClient())
 
@@ -34,10 +40,10 @@ func newClient(conf oAuthConfig, apiUrl string) (*client, error) {
 
 	baseUrl, err := url2.Parse(strings.TrimSuffix(apiUrl, "/"))
 	if err != nil {
-		return nil, fmt.Errorf("soundcloud.client: cannot parse apiUrl %v, err: %w", apiUrl, err)
+		return nil, fmt.Errorf("soundcloud.Client: cannot parse apiUrl %v, err: %w", apiUrl, err)
 	}
 
-	return &client{
+	return &Client{
 		apiUrl: baseUrl,
 		client: authedClient,
 	}, nil
@@ -50,26 +56,26 @@ type Artist struct {
 	Username string `json:"username"`
 }
 
-func (c *client) ArtistByUrl(url string) (Artist, error) {
+func (c *Client) ArtistByUrl(url string) (Artist, error) {
 	params := url2.Values{}
 	params.Add("url", url)
 
 	apiUrl, err := url2.Parse("https://api.soundcloud.com/resolve")
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: Cannot parse: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: Cannot parse: %w", err)
 	}
 	apiUrl.RawQuery = params.Encode()
 
 	req, err := http.NewRequest("GET", apiUrl.String(), nil)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: unexpected error: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: unexpected error: %w", err)
 	}
 
 	req.Header.Set("accept", "application/json; charset=utf-8")
 
 	res, err := c.client.Do(req)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: error executing req: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: error executing req: %w", err)
 	}
 	//nolint:errcheck
 	defer res.Body.Close()
@@ -81,33 +87,33 @@ func (c *client) ArtistByUrl(url string) (Artist, error) {
 	var artist Artist
 	err = json.NewDecoder(res.Body).Decode(&artist)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: error when parsing json: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: error when parsing json: %w", err)
 	}
 
 	return artist, nil
 }
 
-func (c *client) ArtistByUrn(urn string) (Artist, error) {
+func (c *Client) ArtistByUrn(urn string) (Artist, error) {
 	fullPath, err := url2.JoinPath("https://api.soundcloud.com/users/", url2.PathEscape(urn))
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: cannot parse urn %v: %w", fullPath, err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: cannot parse urn %v: %w", fullPath, err)
 	}
 
 	apiUrl, err := url2.Parse(fullPath)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: cannot parse url %v: %w", fullPath, err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: cannot parse url %v: %w", fullPath, err)
 	}
 
 	req, err := http.NewRequest("GET", apiUrl.String(), nil)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: unexpected error: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: unexpected error: %w", err)
 	}
 
 	req.Header.Set("accept", "application/json; charset=utf-8")
 
 	res, err := c.client.Do(req)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: error executing req: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: error executing req: %w", err)
 	}
 	//nolint:errcheck
 	defer res.Body.Close()
@@ -119,8 +125,21 @@ func (c *client) ArtistByUrn(urn string) (Artist, error) {
 	var artist Artist
 	err = json.NewDecoder(res.Body).Decode(&artist)
 	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.client: error when parsing json: %w", err)
+		return Artist{}, fmt.Errorf("soundcloud.Client: error when parsing json: %w", err)
 	}
 
 	return artist, nil
+}
+
+func MustNewClient(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *Client {
+	conf, err := newOAuthConfig(clientId, clientSecret, tokenUrl)
+	if err != nil {
+		t.Fatal("could not create oauth conf %w", err)
+	}
+
+	c, err := NewClient(conf, apiUrl)
+	if err != nil {
+		t.Fatal("could not create Client %w", err)
+	}
+	return c
 }
