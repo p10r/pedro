@@ -10,6 +10,8 @@ import (
 )
 
 func TestJsonFile(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	dumpToFile := os.Getenv("DB_JSON_DUMP_TO_FILE")
 	dir := t.TempDir()
