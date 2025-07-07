@@ -3,7 +3,6 @@ package db_test
 import (
 	"context"
 	"github.com/alecthomas/assert/v2"
-	"github.com/p10r/pedro/internal"
 	"github.com/p10r/pedro/internal/db"
 	"os"
 	"path/filepath"
@@ -25,7 +24,7 @@ func TestJsonFile(t *testing.T) {
 		assert.NoError(t, err)
 
 		artistId := int64(581274912)
-		a := internal.Artist{ID: artistId}
+		a := db.ArtistEntity{ID: artistId}
 
 		err = repo.Add(ctx, a)
 		assert.NoError(t, err)

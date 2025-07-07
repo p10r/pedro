@@ -4,23 +4,26 @@ import (
 	"context"
 	"crawshaw.dev/jsonfile"
 	"fmt"
-	"github.com/p10r/pedro/internal"
 )
 
+type ArtistEntity struct {
+	ID int64
+}
+
 type JsonRepository struct {
-	db *jsonfile.JSONFile[internal.Artist]
+	db *jsonfile.JSONFile[ArtistEntity]
 }
 
 func NewJsonRepository(path string) (*JsonRepository, error) {
-	db, err := jsonfile.New[internal.Artist](path)
+	db, err := jsonfile.New[ArtistEntity](path)
 	if err != nil {
 		return nil, fmt.Errorf("json repo: failed creating repository: %w", err)
 	}
 	return &JsonRepository{db}, err
 }
 
-func (r *JsonRepository) Add(ctx context.Context, artist internal.Artist) error {
-	err := r.db.Write(func(db *internal.Artist) error {
+func (r *JsonRepository) Add(ctx context.Context, artist ArtistEntity) error {
+	err := r.db.Write(func(db *ArtistEntity) error {
 		db.ID = artist.ID
 		return nil
 	})
@@ -31,10 +34,10 @@ func (r *JsonRepository) Add(ctx context.Context, artist internal.Artist) error 
 	return nil
 }
 
-func (r *JsonRepository) ListAllFor(ctx context.Context, id internal.UserId) ([]internal.Artist, error) {
-	var a internal.Artist
-	r.db.Read(func(db *internal.Artist) {
-		a = internal.Artist{ID: db.ID}
+func (r *JsonRepository) ListAllFor(ctx context.Context, id string) ([]ArtistEntity, error) {
+	var a ArtistEntity
+	r.db.Read(func(db *ArtistEntity) {
+		a = ArtistEntity{ID: db.ID}
 	})
-	return []internal.Artist{a}, nil
+	return []ArtistEntity{a}, nil
 }
