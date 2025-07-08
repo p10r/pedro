@@ -1,40 +1,60 @@
 package db_test
 
 import (
-	"context"
 	"github.com/alecthomas/assert/v2"
 	"github.com/p10r/pedro/internal/db"
-	"os"
 	"path/filepath"
 	"testing"
 )
 
+func mustNewRepo(t *testing.T) *db.JsonRepository {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "artists.json")
+	repo, err := db.NewJsonRepository(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return repo
+}
+
 func TestJsonFile(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	dumpToFile := os.Getenv("DB_JSON_DUMP_TO_FILE")
-	dir := t.TempDir()
-	if dumpToFile == "1" {
-		dir = "/local"
-	}
+	t.Run("write and read user to/from json file", func(t *testing.T) {
+		repo := mustNewRepo(t)
 
-	t.Run("write and read artist to/from json file", func(t *testing.T) {
-		path := filepath.Join(dir, "artists.json")
+		userId := int64(581274912)
+		a := db.UserEntity{TelegramId: userId}
 
-		repo, err := db.NewJsonRepository(path)
+		err := repo.Save(a)
 		assert.NoError(t, err)
 
-		artistId := int64(581274912)
-		a := db.ArtistEntity{ID: artistId}
+		user := repo.Get(userId)
+		assert.Equal(t, userId, user.TelegramId)
 
-		err = repo.Add(ctx, a)
-		assert.NoError(t, err)
-
-		artists, err := repo.ListAllFor(ctx, "1")
-		assert.NoError(t, err)
-
-		assert.Equal(t, artistId, artists[0].ID)
+		assert.Equal(t, 1, len(repo.All().Users))
 	})
 
+	t.Run("updates existing user", func(t *testing.T) {
+		repo := mustNewRepo(t)
+
+		userId := int64(124152)
+		entity := db.UserEntity{TelegramId: userId}
+		err := repo.Save(entity)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(repo.All().Users))
+
+		user := repo.Get(userId)
+		assert.Zero(t, user.Artists)
+
+		entity.Artists = []db.ArtistEntity{{
+			Name: "10 Mark DJ Team",
+		}}
+		err = repo.Save(entity)
+		assert.NoError(t, err)
+
+		user = repo.Get(userId)
+		assert.NotZero(t, user.Artists)
+		assert.Equal(t, "10 Mark DJ Team", user.Artists[0].Name)
+	})
 }
