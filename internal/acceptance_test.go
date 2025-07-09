@@ -34,7 +34,6 @@ func mustNewService(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret strin
 }
 
 func TestFollowingArtists(t *testing.T) {
-	t.Parallel()
 
 	clientId := os.Getenv("SOUNDCLOUD_CLIENT_ID")
 	clientSecret := os.Getenv("SOUNDCLOUD_CLIENT_SECRET")
@@ -42,10 +41,11 @@ func TestFollowingArtists(t *testing.T) {
 		t.Skip("set SOUNDCLOUD_CLIENT_SECRET and SOUNDCLOUD_CLIENT_ID to run this test")
 	}
 
-	ctx := context.Background()
-	service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
-
 	t.Run("follow an artist", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+
 		userId := internal.UserId(44124)
 		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/hovrmusic", UserId: userId}
 
@@ -63,6 +63,10 @@ func TestFollowingArtists(t *testing.T) {
 	})
 
 	t.Run("try following an artist that doesn't exist", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+
 		userId := internal.UserId(44124)
 		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/dkwpjaiodwoadboaiwd", UserId: userId}
 
@@ -71,6 +75,10 @@ func TestFollowingArtists(t *testing.T) {
 	})
 
 	t.Run("try following the same artist twice", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+
 		userId := internal.UserId(44124)
 		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/hovrmusic", UserId: userId}
 
@@ -87,4 +95,12 @@ func TestFollowingArtists(t *testing.T) {
 		}}
 		assert.Equal(t, expected, res)
 	})
+
+	t.Run("unfollow artist", func(t *testing.T) {
+		//t.Parallel()
+		//ctx := context.Background()
+		//service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+
+	})
+
 }
