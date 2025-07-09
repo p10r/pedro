@@ -29,7 +29,8 @@ func TestJsonFile(t *testing.T) {
 		err := repo.Save(a)
 		assert.NoError(t, err)
 
-		user := repo.Get(userId)
+		user, found := repo.Get(userId)
+		assert.True(t, found)
 		assert.Equal(t, userId, user.TelegramId)
 
 		assert.Equal(t, 1, len(repo.All().Users))
@@ -44,7 +45,8 @@ func TestJsonFile(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(repo.All().Users))
 
-		user := repo.Get(userId)
+		user, found := repo.Get(userId)
+		assert.True(t, found)
 		assert.Zero(t, user.Artists)
 
 		entity.Artists = []db.ArtistEntity{{
@@ -53,7 +55,8 @@ func TestJsonFile(t *testing.T) {
 		err = repo.Save(entity)
 		assert.NoError(t, err)
 
-		user = repo.Get(userId)
+		user, found = repo.Get(userId)
+		assert.True(t, found)
 		assert.NotZero(t, user.Artists)
 		assert.Equal(t, "10 Mark DJ Team", user.Artists[0].Name)
 	})

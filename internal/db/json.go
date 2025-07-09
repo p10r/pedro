@@ -9,26 +9,6 @@ type UserEntities struct {
 	Users []UserEntity `json:"users"`
 }
 
-func (u UserEntities) Get(userId int64) (entity UserEntity, found bool) {
-	for _, entity := range u.Users {
-		if entity.TelegramId == userId {
-			return entity, true
-		}
-	}
-	return UserEntity{}, false
-}
-
-func (u UserEntities) Save(user UserEntity) UserEntities {
-	existing := u.Users
-	for i, entity := range existing {
-		if entity.TelegramId == user.TelegramId {
-			existing[i] = user
-			return UserEntities{existing}
-		}
-	}
-	return UserEntities{append(u.Users, user)}
-}
-
 type UserEntity struct {
 	TelegramId int64          `json:"telegramId"`
 	Artists    []ArtistEntity `json:"artists"`
@@ -53,9 +33,24 @@ func NewJsonRepository(path string) (*JsonRepository, error) {
 }
 
 func (r *JsonRepository) Save(user UserEntity) error {
-	err := r.db.Write(func(db *UserEntities) error {
-		updated := db.Save(user)
-		db.Users = updated.Users
+	if user.Artists == nil {
+		user.Artists = []ArtistEntity{}
+	}
+
+	err := r.db.Write(func(dbUsers *UserEntities) error {
+		if dbUsers.Users == nil {
+			dbUsers.Users = []UserEntity{}
+		}
+
+		for i, dbUser := range dbUsers.Users {
+			if dbUser.TelegramId == user.TelegramId {
+				dbUsers.Users[i].TelegramId = user.TelegramId
+				dbUsers.Users[i].Artists = user.Artists
+				return nil
+			}
+		}
+
+		dbUsers.Users = append(dbUsers.Users, user)
 		return nil
 	})
 	if err != nil {
@@ -73,14 +68,26 @@ func (r *JsonRepository) All() UserEntities {
 	return users
 }
 
-func (r *JsonRepository) Get(userId int64) UserEntity {
-	var user UserEntity
-	r.db.Read(func(db *UserEntities) {
-		entity, found := db.Get(userId)
-		if !found {
-			user = UserEntity{}
+func (r *JsonRepository) Get(userId int64) (UserEntity, bool) {
+	var user *UserEntity
+	var userFound bool
+	r.db.Read(func(dbUsers *UserEntities) {
+		for _, e := range dbUsers.Users {
+			if e.TelegramId == userId {
+				user = &e
+				userFound = true
+				return
+			}
 		}
-		user = entity
 	})
-	return user
+
+	if !userFound {
+		return UserEntity{}, false
+	}
+
+	if user == nil {
+		return UserEntity{}, false
+	}
+
+	return *user, true
 }
