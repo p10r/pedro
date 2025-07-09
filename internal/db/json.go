@@ -3,6 +3,7 @@ package db
 import (
 	"crawshaw.dev/jsonfile"
 	"fmt"
+	"slices"
 )
 
 type UserEntities struct {
@@ -11,13 +12,25 @@ type UserEntities struct {
 
 type UserEntity struct {
 	TelegramId int64          `json:"telegramId"`
-	Artists    []ArtistEntity `json:"artists"`
+	Artists    ArtistEntities `json:"artists"`
 }
 
 type ArtistEntity struct {
 	Name          string `json:"name"`
 	SoundcloudUrl string `json:"soundcloudUrl"`
 	SoundcloudUrn string `json:"soundcloudUrn"`
+}
+type ArtistEntities []ArtistEntity
+
+func (a ArtistEntities) Put(entity ArtistEntity) ArtistEntities {
+	var soundcloudUrns []string
+	for _, artist := range a {
+		soundcloudUrns = append(soundcloudUrns, artist.SoundcloudUrn)
+	}
+	if !slices.Contains(soundcloudUrns, entity.SoundcloudUrn) {
+		a = append(a, entity)
+	}
+	return a
 }
 
 type JsonRepository struct {

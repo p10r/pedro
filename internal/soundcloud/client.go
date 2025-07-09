@@ -80,6 +80,10 @@ func (c *Client) ArtistByUrl(url string) (Artist, error) {
 	//nolint:errcheck
 	defer res.Body.Close()
 
+	if res.StatusCode == 404 {
+		return Artist{}, fmt.Errorf("cannot find artist %s", url)
+	}
+
 	if res.StatusCode != 200 {
 		return Artist{}, fmt.Errorf("status code is %v", res.Status)
 	}

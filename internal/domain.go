@@ -24,11 +24,6 @@ func NewService(repo *db.JsonRepository, client *soundcloud.Client) *Service {
 	return &Service{repo: repo, sc: client}
 }
 
-// FollowArtist Service should do:
-// - Check if artist exists
-// - If not, go fetch it
-// - Update it to user followings
-// - Return name
 func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
 	id := int64(cmd.UserId)
 	user, found := s.repo.Get(id)
@@ -46,15 +41,14 @@ func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string
 
 	scArtist, err := s.sc.ArtistByUrl(cmd.SoundcloudUrl)
 	if err != nil {
-		return "", fmt.Errorf("could not fetch artist: %w", err)
+		return "", fmt.Errorf("error when trying to find artist %s: %w", cmd.SoundcloudUrl, err)
 	}
 
-	artistEntity := db.ArtistEntity{
+	user.Artists = user.Artists.Put(db.ArtistEntity{
 		Name:          scArtist.Username,
 		SoundcloudUrl: scArtist.Url,
 		SoundcloudUrn: scArtist.Urn,
-	}
-	user.Artists = append(user.Artists, artistEntity)
+	})
 
 	err = s.repo.Save(user)
 	if err != nil {

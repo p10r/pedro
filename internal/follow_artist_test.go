@@ -63,10 +63,28 @@ func TestFollowingArtists(t *testing.T) {
 	})
 
 	t.Run("try following an artist that doesn't exist", func(t *testing.T) {
-		t.Skip("TODO: Implement me")
+		userId := internal.UserId(44124)
+		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/dkwpjaiodwoadboaiwd", UserId: userId}
+
+		_, err := service.FollowArtist(ctx, cmd)
+		assert.Error(t, err)
 	})
 
 	t.Run("try following the same artist twice", func(t *testing.T) {
-		t.Skip("TODO: Implement me")
+		userId := internal.UserId(44124)
+		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/hovrmusic", UserId: userId}
+
+		_, err := service.FollowArtist(ctx, cmd)
+		assert.NoError(t, err)
+		_, err = service.FollowArtist(ctx, cmd)
+		assert.NoError(t, err)
+
+		res, err := service.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		expected := internal.Artists{{
+			Name: "HOVR",
+			Url:  "https://soundcloud.com/hovrmusic",
+		}}
+		assert.Equal(t, expected, res)
 	})
 }
