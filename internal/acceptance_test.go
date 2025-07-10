@@ -4,55 +4,35 @@ import (
 	"context"
 	"github.com/alecthomas/assert/v2"
 	"github.com/p10r/pedro/internal"
-	"github.com/p10r/pedro/internal/db"
-	"github.com/p10r/pedro/internal/soundcloud"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
-func mustNewRepository(t *testing.T) *db.JsonRepository {
-	t.Helper()
-
-	dir := t.TempDir()
-	path := filepath.Join(dir, "Artists.json")
-
-	repo, err := db.NewJsonRepository(path)
-	if err != nil {
-		t.Fatal("err when creating repository: %w", err)
-	}
-
-	return repo
-}
-
-func mustNewService(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *internal.Service {
-	t.Helper()
-
-	sc := soundcloud.MustNewClient(t, tokenUrl, apiUrl, clientId, clientSecret)
-	repo := mustNewRepository(t)
-	return internal.NewService(repo, sc)
-}
-
 func TestFollowingArtists(t *testing.T) {
+	var testEnv func() *internal.Service
 
 	clientId := os.Getenv("SOUNDCLOUD_CLIENT_ID")
 	clientSecret := os.Getenv("SOUNDCLOUD_CLIENT_SECRET")
 	if clientSecret == "" || clientId == "" {
-		t.Skip("set SOUNDCLOUD_CLIENT_SECRET and SOUNDCLOUD_CLIENT_ID to run this test")
+		t.Log("running in in-memory mode")
+		testEnv = func() *internal.Service { return mustNewInMemoryTestEnv(t) }
+	} else {
+		t.Log("running in integration mode")
+		testEnv = func() *internal.Service { return mustNewIntegrationTestEnv(t, clientId, clientSecret) }
 	}
 
 	t.Run("follow an artist", func(t *testing.T) {
 		t.Parallel()
 		ctx := context.Background()
-		service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+		pedro := testEnv()
 
 		userId := internal.UserId(44124)
 		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/hovrmusic", UserId: userId}
 
-		_, err := service.FollowArtist(ctx, cmd)
+		_, err := pedro.FollowArtist(ctx, cmd)
 		assert.NoError(t, err)
 
-		res, err := service.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, userId)
 		assert.NoError(t, err)
 
 		expected := internal.Artists{{
@@ -65,29 +45,29 @@ func TestFollowingArtists(t *testing.T) {
 	t.Run("try following an artist that doesn't exist", func(t *testing.T) {
 		t.Parallel()
 		ctx := context.Background()
-		service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+		pedro := testEnv()
 
 		userId := internal.UserId(44124)
 		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/dkwpjaiodwoadboaiwd", UserId: userId}
 
-		_, err := service.FollowArtist(ctx, cmd)
+		_, err := pedro.FollowArtist(ctx, cmd)
 		assert.Error(t, err)
 	})
 
 	t.Run("try following the same artist twice", func(t *testing.T) {
 		t.Parallel()
 		ctx := context.Background()
-		service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+		pedro := testEnv()
 
 		userId := internal.UserId(44124)
 		cmd := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/hovrmusic", UserId: userId}
 
-		_, err := service.FollowArtist(ctx, cmd)
+		_, err := pedro.FollowArtist(ctx, cmd)
 		assert.NoError(t, err)
-		_, err = service.FollowArtist(ctx, cmd)
+		_, err = pedro.FollowArtist(ctx, cmd)
 		assert.NoError(t, err)
 
-		res, err := service.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, userId)
 		assert.NoError(t, err)
 		expected := internal.Artists{{
 			Name: "HOVR",
@@ -99,7 +79,7 @@ func TestFollowingArtists(t *testing.T) {
 	t.Run("unfollow artist", func(t *testing.T) {
 		//t.Parallel()
 		//ctx := context.Background()
-		//service := mustNewService(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+		//service := mustNewInMemoryTestEnv(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
 
 	})
 
