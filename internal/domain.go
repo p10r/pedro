@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/p10r/pedro/internal/db"
-	"github.com/p10r/pedro/internal/soundcloud"
 	"log"
 )
 
@@ -16,12 +15,23 @@ type FollowArtistCmd struct {
 }
 
 type Service struct {
-	repo *db.JsonRepository
-	sc   *soundcloud.Client
+	repo       *db.JsonRepository
+	soundcloud Soundcloud
 }
 
-func NewService(repo *db.JsonRepository, client *soundcloud.Client) *Service {
-	return &Service{repo: repo, sc: client}
+type Soundcloud interface {
+	ArtistByUrl(url string) (SoundcloudArtist, error)
+}
+
+type SoundcloudArtist struct {
+	Id       int    `json:"id"`
+	Urn      string `json:"urn"`
+	Url      string `json:"permalink_url"`
+	Username string `json:"username"`
+}
+
+func NewService(repo *db.JsonRepository, soundcloudClient Soundcloud) *Service {
+	return &Service{repo: repo, soundcloud: soundcloudClient}
 }
 
 func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
@@ -39,7 +49,7 @@ func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string
 		return s.FollowArtist(ctx, cmd)
 	}
 
-	scArtist, err := s.sc.ArtistByUrl(cmd.SoundcloudUrl)
+	scArtist, err := s.soundcloud.ArtistByUrl(cmd.SoundcloudUrl)
 	if err != nil {
 		return "", fmt.Errorf("error when trying to find artist %s: %w", cmd.SoundcloudUrl, err)
 	}
