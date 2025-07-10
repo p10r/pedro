@@ -39,3 +39,13 @@ Pedro will then:
 - Scrape soundcloud until the set is uploaded (for a given time)
 - Post a comment, tagging you around the time you made the request
 - Try to find out the name of the song/remix
+
+### Block User Messages longer than X
+
+- No need that users eat up tokens
+
+### Provide Claude with the existing artists
+
+- This would help to let the AI fix up any grammar errors
+
+### Handle 529 (Server Overload)
