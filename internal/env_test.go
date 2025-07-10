@@ -2,7 +2,6 @@ package internal_test
 
 import (
 	"github.com/p10r/pedro/internal"
-	"github.com/p10r/pedro/internal/db"
 	"github.com/p10r/pedro/internal/soundcloud"
 	"path/filepath"
 	"testing"
@@ -15,7 +14,7 @@ func mustNewInMemoryTestEnv(t *testing.T) *internal.Service {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "Artists.json")
 
-	repo, err := db.NewJsonRepository(path)
+	repo, err := internal.NewJsonRepository(path)
 	if err != nil {
 		t.Fatal("err when creating repository: %w", err)
 	}
@@ -31,7 +30,7 @@ func mustNewIntegrationTestEnv(t *testing.T, clientId string, clientSecret strin
 
 	dir := t.TempDir()
 	path := filepath.Join(dir, "Artists.json")
-	repo, err := db.NewJsonRepository(path)
+	repo, err := internal.NewJsonRepository(path)
 	if err != nil {
 		t.Fatal("err when creating repository: %w", err)
 	}

@@ -3,65 +3,48 @@ package internal
 import (
 	"context"
 	"fmt"
-	"github.com/p10r/pedro/internal/db"
 	"log"
 	"strings"
 )
 
 type UserId int64
 
-type FollowArtistCmd struct {
-	SoundcloudUrl string
-	UserId        UserId
-}
-
 type Service struct {
-	repo       *db.JsonRepository
+	db         *JsonDb
 	soundcloud Soundcloud
 }
 
-type Soundcloud interface {
-	ArtistByUrl(url string) (SoundcloudArtist, error)
+func NewService(db *JsonDb, soundcloudClient Soundcloud) *Service {
+	return &Service{db: db, soundcloud: soundcloudClient}
 }
 
-type SoundcloudArtist struct {
-	Id       int    `json:"id"`
-	Urn      string `json:"urn"`
-	Url      string `json:"permalink_url"`
-	Username string `json:"username"`
-}
-
-func NewService(repo *db.JsonRepository, soundcloudClient Soundcloud) *Service {
-	return &Service{repo: repo, soundcloud: soundcloudClient}
-}
-
-func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
+func (service *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
 	id := int64(cmd.UserId)
-	user, found := s.repo.Get(id)
+	user, found := service.db.Get(id)
 
 	// There's no explicit endpoint to add users, since access toggled via an env variable.
 	// This means that for now, every user who has API access will be created transparently in the DB, if missing.
 	if !found {
 		log.Printf("No user with id %v, creating a new entry", id)
-		err := s.createUser(id)
+		err := service.createUser(id)
 		if err != nil {
 			return "", fmt.Errorf("got err when trying to create user: %w", err)
 		}
-		return s.FollowArtist(ctx, cmd)
+		return service.FollowArtist(ctx, cmd)
 	}
 
-	scArtist, err := s.soundcloud.ArtistByUrl(cmd.SoundcloudUrl)
+	scArtist, err := service.soundcloud.ArtistByUrl(cmd.SoundcloudUrl)
 	if err != nil {
-		return "", fmt.Errorf("error when trying to find artist %s: %w", cmd.SoundcloudUrl, err)
+		return "", fmt.Errorf("error when trying to find artist %service: %w", cmd.SoundcloudUrl, err)
 	}
 
-	user.Artists = user.Artists.Put(db.ArtistEntity{
+	user.Artists = user.Artists.Put(ArtistEntity{
 		Name:          scArtist.Username,
 		SoundcloudUrl: scArtist.Url,
 		SoundcloudUrn: scArtist.Urn,
 	})
 
-	err = s.repo.Save(user)
+	err = service.db.Save(user)
 	if err != nil {
 		return "", fmt.Errorf("err when trying to follow artist %v. err: %w", cmd.SoundcloudUrl, err)
 	}
@@ -69,26 +52,21 @@ func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string
 	return scArtist.Username, nil
 }
 
-type UnfollowArtistCmd struct {
-	ArtistName string
-	UserId     UserId
-}
-
-func (s *Service) UnfollowArtist(_ context.Context, cmd UnfollowArtistCmd) (artistName string, err error) {
+func (service *Service) UnfollowArtist(_ context.Context, cmd UnfollowArtistCmd) (artistName string, err error) {
 	userId := int64(cmd.UserId)
-	user, found := s.repo.Get(userId)
+	user, found := service.db.Get(userId)
 	if !found {
 		return "", fmt.Errorf("no user with id %v", userId)
 	}
 
 	updatedArtists, found := user.Artists.Remove(cmd.ArtistName)
 	if !found {
-		err := fmt.Errorf("could not find artist %s in user's artists: %s", cmd.ArtistName, strings.Join(user.Artists.Names(), ", "))
+		err := fmt.Errorf("could not find artist %service in user'service artists: %service", cmd.ArtistName, strings.Join(user.Artists.Names(), ", "))
 		return "", err
 	}
 
 	user.Artists = updatedArtists
-	err = s.repo.Save(user)
+	err = service.db.Save(user)
 	if err != nil {
 		return "", fmt.Errorf("err when trying to unfollow artist %v. err: %w", cmd.ArtistName, err)
 	}
@@ -103,9 +81,9 @@ type Artist struct {
 	Url  string
 }
 
-func (s *Service) ListArtists(_ context.Context, userId UserId) (Artists, error) {
+func (service *Service) ListArtists(_ context.Context, userId UserId) (Artists, error) {
 	id := int64(userId)
-	userEntity, found := s.repo.Get(id)
+	userEntity, found := service.db.Get(id)
 	if !found {
 		return Artists{}, fmt.Errorf("no user with id %v", id)
 	}
@@ -122,8 +100,8 @@ func (s *Service) ListArtists(_ context.Context, userId UserId) (Artists, error)
 	return artists, nil
 }
 
-func (s *Service) createUser(id int64) error {
-	err := s.repo.Save(db.UserEntity{
+func (service *Service) createUser(id int64) error {
+	err := service.db.Save(UserEntity{
 		TelegramId: id,
 	})
 	if err != nil {

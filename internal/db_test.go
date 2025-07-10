@@ -1,16 +1,16 @@
-package db_test
+package internal_test
 
 import (
 	"github.com/alecthomas/assert/v2"
-	"github.com/p10r/pedro/internal/db"
+	"github.com/p10r/pedro/internal"
 	"path/filepath"
 	"testing"
 )
 
-func mustNewRepo(t *testing.T) *db.JsonRepository {
+func mustNewRepo(t *testing.T) *internal.JsonDb {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "artists.json")
-	repo, err := db.NewJsonRepository(path)
+	repo, err := internal.NewJsonRepository(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +24,7 @@ func TestJsonFile(t *testing.T) {
 		repo := mustNewRepo(t)
 
 		userId := int64(581274912)
-		a := db.UserEntity{TelegramId: userId}
+		a := internal.UserEntity{TelegramId: userId}
 
 		err := repo.Save(a)
 		assert.NoError(t, err)
@@ -40,7 +40,7 @@ func TestJsonFile(t *testing.T) {
 		repo := mustNewRepo(t)
 
 		userId := int64(124152)
-		entity := db.UserEntity{TelegramId: userId}
+		entity := internal.UserEntity{TelegramId: userId}
 		err := repo.Save(entity)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(repo.All().Users))
@@ -49,7 +49,7 @@ func TestJsonFile(t *testing.T) {
 		assert.True(t, found)
 		assert.Zero(t, user.Artists)
 
-		entity.Artists = []db.ArtistEntity{{
+		entity.Artists = []internal.ArtistEntity{{
 			Name: "10 Mark DJ Team",
 		}}
 		err = repo.Save(entity)

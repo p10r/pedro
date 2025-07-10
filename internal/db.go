@@ -1,4 +1,4 @@
-package db
+package internal
 
 import (
 	"crawshaw.dev/jsonfile"
@@ -54,19 +54,19 @@ func (artists ArtistEntities) Names() []string {
 	return names
 }
 
-type JsonRepository struct {
+type JsonDb struct {
 	db *jsonfile.JSONFile[UserEntities]
 }
 
-func NewJsonRepository(path string) (*JsonRepository, error) {
+func NewJsonRepository(path string) (*JsonDb, error) {
 	db, err := jsonfile.New[UserEntities](path)
 	if err != nil {
-		return nil, fmt.Errorf("json repo: failed creating repository: %w", err)
+		return nil, fmt.Errorf("json db: failed creating repository: %w", err)
 	}
-	return &JsonRepository{db}, err
+	return &JsonDb{db}, err
 }
 
-func (r *JsonRepository) Save(user UserEntity) error {
+func (r *JsonDb) Save(user UserEntity) error {
 	if user.Artists == nil {
 		user.Artists = []ArtistEntity{}
 	}
@@ -88,13 +88,13 @@ func (r *JsonRepository) Save(user UserEntity) error {
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("json repo: failed writing to json file: %w", err)
+		return fmt.Errorf("json db: failed writing to json file: %w", err)
 	}
 
 	return nil
 }
 
-func (r *JsonRepository) All() UserEntities {
+func (r *JsonDb) All() UserEntities {
 	var users UserEntities
 	r.db.Read(func(db *UserEntities) {
 		users = *db
@@ -102,7 +102,7 @@ func (r *JsonRepository) All() UserEntities {
 	return users
 }
 
-func (r *JsonRepository) Get(userId int64) (UserEntity, bool) {
+func (r *JsonDb) Get(userId int64) (UserEntity, bool) {
 	var user *UserEntity
 	var userFound bool
 	r.db.Read(func(dbUsers *UserEntities) {
