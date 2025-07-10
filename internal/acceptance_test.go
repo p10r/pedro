@@ -77,10 +77,63 @@ func TestFollowingArtists(t *testing.T) {
 	})
 
 	t.Run("unfollow artist", func(t *testing.T) {
-		//t.Parallel()
-		//ctx := context.Background()
-		//service := mustNewInMemoryTestEnv(t, soundcloud.TokenUrl, soundcloud.ApiUrl, clientId, clientSecret)
+		t.Parallel()
+		ctx := context.Background()
+		pedro := testEnv()
 
+		userId := internal.UserId(1241)
+		bizzarro := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/bizzarro_universe", UserId: userId}
+		hovr := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/hovrmusic", UserId: userId}
+
+		_, err := pedro.FollowArtist(ctx, hovr)
+		assert.NoError(t, err)
+		_, err = pedro.FollowArtist(ctx, bizzarro)
+		assert.NoError(t, err)
+
+		res, err := pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		assert.Equal(t, "HOVR", res[0].Name)
+
+		unfollowCmd := internal.UnfollowArtistCmd{
+			ArtistName: "HOVR",
+			UserId:     userId,
+		}
+		name, err := pedro.UnfollowArtist(ctx, unfollowCmd)
+		assert.NoError(t, err)
+		assert.Equal(t, "HOVR", name)
+
+		res, err = pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		assert.Equal(t, internal.Artists{{
+			Name: "Bizzarro Universe",
+			Url:  "https://soundcloud.com/bizzarro_universe",
+		}}, res)
+	})
+
+	t.Run("try unfollowing an artist that is not in user's followed artists", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		pedro := testEnv()
+		userId := internal.UserId(1241)
+
+		bizzarro := internal.FollowArtistCmd{SoundcloudUrl: "https://soundcloud.com/bizzarro_universe", UserId: userId}
+		_, err := pedro.FollowArtist(ctx, bizzarro)
+		assert.NoError(t, err)
+
+		res, err := pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(res))
+
+		cmd := internal.UnfollowArtistCmd{
+			ArtistName: "UNKNOWN",
+			UserId:     userId,
+		}
+		_, err = pedro.UnfollowArtist(ctx, cmd)
+		assert.Error(t, err)
+
+		res, err = pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(res))
 	})
 
 }

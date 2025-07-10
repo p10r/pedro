@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/p10r/pedro/internal/db"
 	"log"
+	"strings"
 )
 
 type UserId int64
@@ -68,14 +69,31 @@ func (s *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string
 	return scArtist.Username, nil
 }
 
-func (s *Service) createUser(id int64) error {
-	err := s.repo.Save(db.UserEntity{
-		TelegramId: id,
-	})
-	if err != nil {
-		return fmt.Errorf("could not create user %v, err: %w", id, err)
+type UnfollowArtistCmd struct {
+	ArtistName string
+	UserId     UserId
+}
+
+func (s *Service) UnfollowArtist(_ context.Context, cmd UnfollowArtistCmd) (artistName string, err error) {
+	userId := int64(cmd.UserId)
+	user, found := s.repo.Get(userId)
+	if !found {
+		return "", fmt.Errorf("no user with id %v", userId)
 	}
-	return nil
+
+	updatedArtists, found := user.Artists.Remove(cmd.ArtistName)
+	if !found {
+		err := fmt.Errorf("could not find artist %s in user's artists: %s", cmd.ArtistName, strings.Join(user.Artists.Names(), ", "))
+		return "", err
+	}
+
+	user.Artists = updatedArtists
+	err = s.repo.Save(user)
+	if err != nil {
+		return "", fmt.Errorf("err when trying to unfollow artist %v. err: %w", cmd.ArtistName, err)
+	}
+
+	return cmd.ArtistName, nil
 }
 
 type Artists []Artist
@@ -102,4 +120,14 @@ func (s *Service) ListArtists(_ context.Context, userId UserId) (Artists, error)
 	}
 
 	return artists, nil
+}
+
+func (s *Service) createUser(id int64) error {
+	err := s.repo.Save(db.UserEntity{
+		TelegramId: id,
+	})
+	if err != nil {
+		return fmt.Errorf("could not create user %v, err: %w", id, err)
+	}
+	return nil
 }

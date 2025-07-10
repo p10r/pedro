@@ -22,15 +22,36 @@ type ArtistEntity struct {
 }
 type ArtistEntities []ArtistEntity
 
-func (a ArtistEntities) Put(entity ArtistEntity) ArtistEntities {
+func (artists ArtistEntities) Put(entity ArtistEntity) ArtistEntities {
 	var soundcloudUrns []string
-	for _, artist := range a {
+	for _, artist := range artists {
 		soundcloudUrns = append(soundcloudUrns, artist.SoundcloudUrn)
 	}
 	if !slices.Contains(soundcloudUrns, entity.SoundcloudUrn) {
-		a = append(a, entity)
+		artists = append(artists, entity)
 	}
-	return a
+	return artists
+}
+
+func (artists ArtistEntities) Remove(name string) (entity ArtistEntities, found bool) {
+	for i, e := range artists {
+		if e.Name == name {
+			artists[i] = artists[len(artists)-1]
+			return artists[:len(artists)-1], true
+		}
+	}
+	return artists, false
+}
+
+func (artists ArtistEntities) Names() []string {
+	var names []string
+	for _, entity := range artists {
+		names = append(names, entity.Name)
+	}
+	if len(names) == 0 {
+		return []string{}
+	}
+	return names
 }
 
 type JsonRepository struct {
