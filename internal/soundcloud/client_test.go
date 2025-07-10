@@ -24,13 +24,4 @@ func TestProdSoundcloud(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "Bizzarro Universe", res.Username)
 	})
-
-	t.Run("fetches artist by urn", func(t *testing.T) {
-		c := MustNewClient(t, TokenUrl, ApiUrl, clientId, clientSecret)
-
-		res, err := c.ArtistByUrn(exampleArtistUrn)
-		assert.NoError(t, err)
-		assert.Equal(t, "Bizzarro Universe", res.Username)
-	})
-
 }

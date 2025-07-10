@@ -97,44 +97,6 @@ func (c *Client) ArtistByUrl(url string) (Artist, error) {
 	return artist, nil
 }
 
-func (c *Client) ArtistByUrn(urn string) (Artist, error) {
-	fullPath, err := url2.JoinPath("https://api.soundcloud.com/users/", url2.PathEscape(urn))
-	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.Client: cannot parse urn %v: %w", fullPath, err)
-	}
-
-	apiUrl, err := url2.Parse(fullPath)
-	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.Client: cannot parse url %v: %w", fullPath, err)
-	}
-
-	req, err := http.NewRequest("GET", apiUrl.String(), nil)
-	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.Client: unexpected error: %w", err)
-	}
-
-	req.Header.Set("accept", "application/json; charset=utf-8")
-
-	res, err := c.client.Do(req)
-	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.Client: error executing req: %w", err)
-	}
-	//nolint:errcheck
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		return Artist{}, fmt.Errorf("status code is %v", res.Status)
-	}
-
-	var artist Artist
-	err = json.NewDecoder(res.Body).Decode(&artist)
-	if err != nil {
-		return Artist{}, fmt.Errorf("soundcloud.Client: error when parsing json: %w", err)
-	}
-
-	return artist, nil
-}
-
 func MustNewClient(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *Client {
 	conf, err := newOAuthConfig(clientId, clientSecret, tokenUrl)
 	if err != nil {
