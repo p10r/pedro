@@ -38,7 +38,7 @@ func (f *Fake) ParseCommand(text string) (internal.ParsingResult, error) {
 		}
 
 		return internal.ParsingResult{
-			Command:       "UNFOLLOW",
+			Command:       internal.ParsingCmdUnfollow,
 			SoundcloudUrl: "",
 			ArtistName:    artist,
 		}, nil
@@ -48,14 +48,14 @@ func (f *Fake) ParseCommand(text string) (internal.ParsingResult, error) {
 		url := f.artistRegex.FindString(text)
 
 		return internal.ParsingResult{
-			Command:       "FOLLOW",
+			Command:       internal.ParsingCmdFollow,
 			SoundcloudUrl: url,
 			ArtistName:    "",
 		}, nil
 	}
 
 	return internal.ParsingResult{
-		Command:       "PARSING_ERROR",
+		Command:       internal.ParsingError,
 		SoundcloudUrl: "",
 		ArtistName:    "",
 	}, nil

@@ -25,7 +25,7 @@ func (pedro *Pedro) ParseAndExecute(ctx context.Context, text string, userId Use
 	}
 
 	switch command.Command {
-	case "FOLLOW":
+	case ParsingCmdFollow:
 		c := FollowArtistCmd{
 			SoundcloudUrl: command.SoundcloudUrl,
 			UserId:        userId,
@@ -36,7 +36,7 @@ func (pedro *Pedro) ParseAndExecute(ctx context.Context, text string, userId Use
 		}
 		return fmt.Sprintf("You're now following %s", success), nil
 
-	case "UNFOLLOW":
+	case ParsingCmdUnfollow:
 		c := UnfollowArtistCmd{
 			ArtistName: command.ArtistName,
 			UserId:     userId,
@@ -47,7 +47,7 @@ func (pedro *Pedro) ParseAndExecute(ctx context.Context, text string, userId Use
 		}
 		return fmt.Sprintf("You stopped following %s", success), nil
 
-	case "PARSING_ERROR":
+	case ParsingError:
 		return "", fmt.Errorf("we're sorry, your input could not be parsed")
 
 	default:
