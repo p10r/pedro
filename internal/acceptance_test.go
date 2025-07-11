@@ -43,6 +43,26 @@ func TestFollowingArtists(t *testing.T) {
 		assert.Equal(t, expected, res)
 	})
 
+	t.Run("follow an artist through free text", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		pedro := testEnv()
+
+		userId := internal.UserId(44124)
+		success, err := pedro.ParseAndExecute(ctx, "Hi, I want to follow https://soundcloud.com/bizzarro_universe", userId)
+		assert.NoError(t, err)
+		assert.Equal(t, "You're now following Bizzarro Universe", success)
+
+		res, err := pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+
+		expected := internal.Artists{{
+			Name: "Bizzarro Universe",
+			Url:  "https://soundcloud.com/bizzarro_universe",
+		}}
+		assert.Equal(t, expected, res)
+	})
+
 	t.Run("try following an artist that doesn't exist", func(t *testing.T) {
 		t.Parallel()
 		ctx := context.Background()
@@ -109,6 +129,28 @@ func TestFollowingArtists(t *testing.T) {
 			Name: "Bizzarro Universe",
 			Url:  "https://soundcloud.com/bizzarro_universe",
 		}}, res)
+	})
+
+	t.Run("unfollow an artist through free text", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		pedro := testEnv()
+
+		userId := internal.UserId(44124)
+		_, err := pedro.ParseAndExecute(ctx, "Hi, I want to follow https://soundcloud.com/bizzarro_universe", userId)
+		assert.NoError(t, err)
+
+		artists, err := pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(artists))
+
+		success, err := pedro.ParseAndExecute(ctx, "Hi, I want to stop following Bizzarro Universe", userId)
+		assert.NoError(t, err)
+		assert.Equal(t, "You stopped following Bizzarro Universe", success)
+
+		artists, err = pedro.ListArtists(ctx, userId)
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(artists))
 	})
 
 	t.Run("try unfollowing an artist that is not in user's followed artists", func(t *testing.T) {

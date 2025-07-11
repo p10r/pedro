@@ -20,7 +20,7 @@ func mustNewInMemoryTestEnv(t *testing.T) *internal.Pedro {
 		t.Fatal("err when creating repository: %w", err)
 	}
 
-	ai := claude.NewFake()
+	ai := claude.NewFake(t)
 
 	return internal.NewPedro(db, sc, ai)
 }
