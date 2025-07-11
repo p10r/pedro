@@ -58,7 +58,7 @@ type JsonDb struct {
 	db *jsonfile.JSONFile[UserEntities]
 }
 
-func NewJsonRepository(path string) (*JsonDb, error) {
+func NewJsonDb(path string) (*JsonDb, error) {
 	db, err := jsonfile.New[UserEntities](path)
 	if err != nil {
 		return nil, fmt.Errorf("json db: failed creating repository: %w", err)

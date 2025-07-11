@@ -9,16 +9,17 @@ import (
 )
 
 func TestFollowingArtists(t *testing.T) {
-	var testEnv func() *internal.Service
+	var testEnv func() *internal.Pedro
 
 	clientId := os.Getenv("SOUNDCLOUD_CLIENT_ID")
 	clientSecret := os.Getenv("SOUNDCLOUD_CLIENT_SECRET")
-	if clientSecret == "" || clientId == "" {
+	claudeApiKey := os.Getenv("CLAUDE_API_KEY")
+	if clientSecret == "" || clientId == "" || claudeApiKey == "" {
 		t.Log("running in in-memory mode")
-		testEnv = func() *internal.Service { return mustNewInMemoryTestEnv(t) }
+		testEnv = func() *internal.Pedro { return mustNewInMemoryTestEnv(t) }
 	} else {
 		t.Log("running in integration mode")
-		testEnv = func() *internal.Service { return mustNewIntegrationTestEnv(t, clientId, clientSecret) }
+		testEnv = func() *internal.Pedro { return mustNewIntegrationTestEnv(t, clientId, clientSecret, claudeApiKey) }
 	}
 
 	t.Run("follow an artist", func(t *testing.T) {

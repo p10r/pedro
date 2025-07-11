@@ -14,7 +14,7 @@ type FakeResponses struct {
 	resolveEndpoint map[string]internal.SoundcloudArtist
 }
 
-func NewInMemoryClient(t *testing.T) *Fake {
+func NewFakeClient(t *testing.T) *Fake {
 	t.Helper()
 
 	resolveUrl := map[string]internal.SoundcloudArtist{

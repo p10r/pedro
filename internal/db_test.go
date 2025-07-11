@@ -10,7 +10,7 @@ import (
 func mustNewRepo(t *testing.T) *internal.JsonDb {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "artists.json")
-	repo, err := internal.NewJsonRepository(path)
+	repo, err := internal.NewJsonDb(path)
 	if err != nil {
 		t.Fatal(err)
 	}

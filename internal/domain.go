@@ -9,16 +9,16 @@ import (
 
 type UserId int64
 
-type Service struct {
+type service struct {
 	db         *JsonDb
 	soundcloud Soundcloud
 }
 
-func NewService(db *JsonDb, soundcloudClient Soundcloud) *Service {
-	return &Service{db: db, soundcloud: soundcloudClient}
+func newService(db *JsonDb, soundcloudClient Soundcloud) *service {
+	return &service{db: db, soundcloud: soundcloudClient}
 }
 
-func (service *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
+func (service *service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
 	id := int64(cmd.UserId)
 	user, found := service.db.Get(id)
 
@@ -52,7 +52,7 @@ func (service *Service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (
 	return scArtist.Username, nil
 }
 
-func (service *Service) UnfollowArtist(_ context.Context, cmd UnfollowArtistCmd) (artistName string, err error) {
+func (service *service) UnfollowArtist(_ context.Context, cmd UnfollowArtistCmd) (artistName string, err error) {
 	userId := int64(cmd.UserId)
 	user, found := service.db.Get(userId)
 	if !found {
@@ -81,7 +81,7 @@ type Artist struct {
 	Url  string
 }
 
-func (service *Service) ListArtists(_ context.Context, userId UserId) (Artists, error) {
+func (service *service) ListArtists(_ context.Context, userId UserId) (Artists, error) {
 	id := int64(userId)
 	userEntity, found := service.db.Get(id)
 	if !found {
@@ -100,7 +100,7 @@ func (service *Service) ListArtists(_ context.Context, userId UserId) (Artists, 
 	return artists, nil
 }
 
-func (service *Service) createUser(id int64) error {
+func (service *service) createUser(id int64) error {
 	err := service.db.Save(UserEntity{
 		TelegramId: id,
 	})
