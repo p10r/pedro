@@ -49,3 +49,8 @@ Pedro will then:
 - This would help to let the AI fix up any grammar errors
 
 ### Handle 529 (Server Overload)
+
+# Links
+
+- [Authentication with Soundcloud API](https://developers.soundcloud.com/docs#authentication)
+- [Soundcloud API Docs](https://developers.soundcloud.com/docs/api/explorer/open-api)
