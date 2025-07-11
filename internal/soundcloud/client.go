@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/p10r/pedro/httputil"
 	"github.com/p10r/pedro/internal"
+	"github.com/p10r/pedro/internal/foundation"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
@@ -26,7 +26,7 @@ type Client struct {
 
 func NewClient(conf oAuthConfig, apiUrl string) (*Client, error) {
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, httputil.NewDefaultClient())
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, foundation.NewDefaultClient())
 
 	config := &clientcredentials.Config{
 		ClientID:       conf.clientId,

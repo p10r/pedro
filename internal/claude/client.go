@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/p10r/pedro/httputil"
 	"github.com/p10r/pedro/internal"
+	"github.com/p10r/pedro/internal/foundation"
 	"net/http"
 )
 
@@ -24,7 +24,7 @@ func NewClient(apiUrl string, apiKey string) *Client {
 	return &Client{
 		ApiUrl: apiUrl,
 		ApiKey: apiKey,
-		client: httputil.NewDefaultClient(),
+		client: foundation.NewDefaultClient(),
 	}
 }
 

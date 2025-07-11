@@ -1,4 +1,4 @@
-package httputil
+package foundation
 
 import (
 	"net"
@@ -7,7 +7,6 @@ import (
 )
 
 func NewDefaultClient() *http.Client {
-	// TODO use me in more places!
 	return &http.Client{
 		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
