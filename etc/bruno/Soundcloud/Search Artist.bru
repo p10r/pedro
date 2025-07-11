@@ -1,0 +1,15 @@
+meta {
+  name: Search Artist
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://api.soundcloud.com/users?q=sinamin
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: sinamin
+}
