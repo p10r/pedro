@@ -17,11 +17,18 @@ func TestProdSoundcloud(t *testing.T) {
 		t.Skip("set SOUNDCLOUD_CLIENT_SECRET, SOUNDCLOUD_CLIENT_ID and SOUNDCLOUD_ARTIST_URN to run this test")
 	}
 
+	c := MustNewClient(t, TokenUrl, ApiUrl, clientId, clientSecret)
+
 	t.Run("fetches artist by url", func(t *testing.T) {
-		c := MustNewClient(t, TokenUrl, ApiUrl, clientId, clientSecret)
 
 		res, err := c.ArtistByUrl("https://soundcloud.com/bizzarro_universe")
 		assert.NoError(t, err)
 		assert.Equal(t, "Bizzarro Universe", res.Username)
+	})
+
+	t.Run("finds artist by search query", func(t *testing.T) {
+		res, err := c.ArtistByQuery("Anna Reusch")
+		assert.NoError(t, err)
+		assert.True(t, len(res) > 30)
 	})
 }

@@ -18,11 +18,12 @@ type ParsingResult struct {
 
 type Soundcloud interface {
 	ArtistByUrl(url string) (SoundcloudArtist, error)
+	ArtistByQuery(query string) ([]SoundcloudArtist, error)
 }
-
 type SoundcloudArtist struct {
-	Id       int    `json:"id"`
-	Urn      string `json:"urn"`
-	Url      string `json:"permalink_url"`
-	Username string `json:"username"`
+	Id             int    `json:"id"`
+	Urn            string `json:"urn"`
+	Url            string `json:"permalink_url"`
+	Username       string `json:"username"`
+	FollowersCount int    `json:"followers_count"`
 }

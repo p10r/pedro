@@ -20,7 +20,7 @@ const (
 )
 
 type Client struct {
-	apiUrl *url2.URL
+	apiUrl string
 	client *http.Client
 }
 
@@ -39,10 +39,7 @@ func NewClient(conf OAuthConfig, apiUrl string) (*Client, error) {
 
 	authedClient := config.Client(ctx)
 
-	baseUrl, err := url2.Parse(strings.TrimSuffix(apiUrl, "/"))
-	if err != nil {
-		return nil, fmt.Errorf("soundcloud.Client: cannot parse apiUrl %v, err: %w", apiUrl, err)
-	}
+	baseUrl := strings.TrimSuffix(apiUrl, "/")
 
 	return &Client{
 		apiUrl: baseUrl,
@@ -54,7 +51,7 @@ func (c *Client) ArtistByUrl(url string) (internal.SoundcloudArtist, error) {
 	params := url2.Values{}
 	params.Add("url", url)
 
-	apiUrl, err := url2.Parse("https://api.soundcloud.com/resolve")
+	apiUrl, err := url2.Parse(c.apiUrl + "/resolve")
 	if err != nil {
 		return internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: Cannot parse: %w", err)
 	}
@@ -86,6 +83,43 @@ func (c *Client) ArtistByUrl(url string) (internal.SoundcloudArtist, error) {
 	err = json.NewDecoder(res.Body).Decode(&artist)
 	if err != nil {
 		return internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: error when parsing json: %w", err)
+	}
+
+	return artist, nil
+}
+
+func (c *Client) ArtistByQuery(query string) ([]internal.SoundcloudArtist, error) {
+	params := url2.Values{}
+	params.Add("q", query)
+
+	apiUrl, err := url2.Parse(c.apiUrl + "/users")
+	if err != nil {
+		return []internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: Cannot parse: %w", err)
+	}
+	apiUrl.RawQuery = params.Encode()
+
+	req, err := http.NewRequest("GET", apiUrl.String(), nil)
+	if err != nil {
+		return []internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: unexpected error: %w", err)
+	}
+
+	req.Header.Set("accept", "application/json; charset=utf-8")
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return []internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: error executing req: %w", err)
+	}
+	//nolint:errcheck
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return []internal.SoundcloudArtist{}, fmt.Errorf("status code is %v", res.Status)
+	}
+
+	var artist []internal.SoundcloudArtist
+	err = json.NewDecoder(res.Body).Decode(&artist)
+	if err != nil {
+		return []internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: error when parsing json: %w", err)
 	}
 
 	return artist, nil
