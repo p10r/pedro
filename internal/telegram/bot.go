@@ -1,13 +1,15 @@
 package telegram
 
 import (
+	"context"
+	"github.com/p10r/pedro/internal"
 	"gopkg.in/telebot.v4"
 	"gopkg.in/telebot.v4/middleware"
 	"log"
 	"time"
 )
 
-func NewPedroBot(botToken string, allowedUserIds []int64) *telebot.Bot {
+func NewBot(botToken string, allowedUserIds []int64, pedro *internal.Pedro) *telebot.Bot {
 	bot, err := telebot.NewBot(
 		telebot.Settings{
 			Token:   botToken,
@@ -19,10 +21,26 @@ func NewPedroBot(botToken string, allowedUserIds []int64) *telebot.Bot {
 		log.Fatal("Cannot create telegram bot")
 	}
 
-	sender := NewTelegramSender()
-
 	bot.Use(middleware.Whitelist(allowedUserIds...))
-	bot.Handle("/follow", listArtists(sender))
+	bot.Handle(telebot.OnText, func(c telebot.Context) error {
+		// TODO check
+		ctx := context.Background()
+		// All the text messages that weren't
+		// captured by existing handlers.
+
+		var (
+			user = c.Sender()
+			text = c.Text()
+		)
+
+		success, err := pedro.ParseAndExecute(ctx, text, internal.UserId(user.ID))
+		if err != nil {
+			_ = c.Send(err)
+			return err
+		}
+
+		return c.Send(success)
+	})
 
 	return bot
 }

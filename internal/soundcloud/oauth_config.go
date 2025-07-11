@@ -2,25 +2,25 @@ package soundcloud
 
 import "fmt"
 
-// oAuthConfig provides all the necessary parameters for clientcredentials.Config
-type oAuthConfig struct {
+// OAuthConfig provides all the necessary parameters for clientcredentials.Config
+type OAuthConfig struct {
 	clientId     string
 	clientSecret string
 	tokenUrl     string
 }
 
-func newOAuthConfig(clientId, clientSecret, tokenUrl string) (oAuthConfig, error) {
+func NewOAuthConfig(clientId, clientSecret, tokenUrl string) (OAuthConfig, error) {
 	if clientId == "" {
-		return oAuthConfig{}, fmt.Errorf("clientId can't be empty")
+		return OAuthConfig{}, fmt.Errorf("clientId can't be empty")
 	}
 	if clientSecret == "" {
-		return oAuthConfig{}, fmt.Errorf("clientSecret can't be empty")
+		return OAuthConfig{}, fmt.Errorf("clientSecret can't be empty")
 	}
 	if tokenUrl == "" {
-		return oAuthConfig{}, fmt.Errorf("tokenUrl can't be empty")
+		return OAuthConfig{}, fmt.Errorf("tokenUrl can't be empty")
 	}
 
-	return oAuthConfig{
+	return OAuthConfig{
 		clientId:     clientId,
 		clientSecret: clientSecret,
 		tokenUrl:     tokenUrl,

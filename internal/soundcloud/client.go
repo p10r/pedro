@@ -24,7 +24,7 @@ type Client struct {
 	client *http.Client
 }
 
-func NewClient(conf oAuthConfig, apiUrl string) (*Client, error) {
+func NewClient(conf OAuthConfig, apiUrl string) (*Client, error) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, foundation.NewDefaultClient())
 
@@ -92,7 +92,7 @@ func (c *Client) ArtistByUrl(url string) (internal.SoundcloudArtist, error) {
 }
 
 func MustNewClient(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *Client {
-	conf, err := newOAuthConfig(clientId, clientSecret, tokenUrl)
+	conf, err := NewOAuthConfig(clientId, clientSecret, tokenUrl)
 	if err != nil {
 		t.Fatal("could not create oauth conf %w", err)
 	}
