@@ -81,8 +81,8 @@ type Artist struct {
 	Url  string
 }
 
-func (service *service) ListArtists(_ context.Context, userId UserId) (Artists, error) {
-	id := int64(userId)
+func (service *service) ListArtists(_ context.Context, cmd ListArtistsCmd) (Artists, error) {
+	id := int64(cmd.UserId)
 	userEntity, found := service.db.Get(id)
 	if !found {
 		return Artists{}, fmt.Errorf("no user with id %v", id)

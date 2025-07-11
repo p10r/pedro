@@ -9,3 +9,7 @@ type UnfollowArtistCmd struct {
 	ArtistName string
 	UserId     UserId
 }
+
+type ListArtistsCmd struct {
+	UserId UserId
+}

@@ -33,7 +33,7 @@ func TestFollowingArtists(t *testing.T) {
 		_, err := pedro.FollowArtist(ctx, cmd)
 		assert.NoError(t, err)
 
-		res, err := pedro.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 
 		expected := internal.Artists{{
@@ -53,7 +53,7 @@ func TestFollowingArtists(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "You're now following Bizzarro Universe", success)
 
-		res, err := pedro.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 
 		expected := internal.Artists{{
@@ -88,7 +88,7 @@ func TestFollowingArtists(t *testing.T) {
 		_, err = pedro.FollowArtist(ctx, cmd)
 		assert.NoError(t, err)
 
-		res, err := pedro.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		expected := internal.Artists{{
 			Name: "HOVR",
@@ -111,7 +111,7 @@ func TestFollowingArtists(t *testing.T) {
 		_, err = pedro.FollowArtist(ctx, bizzarro)
 		assert.NoError(t, err)
 
-		res, err := pedro.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		assert.Equal(t, "HOVR", res[0].Name)
 
@@ -123,7 +123,7 @@ func TestFollowingArtists(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "HOVR", name)
 
-		res, err = pedro.ListArtists(ctx, userId)
+		res, err = pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		assert.Equal(t, internal.Artists{{
 			Name: "Bizzarro Universe",
@@ -140,7 +140,7 @@ func TestFollowingArtists(t *testing.T) {
 		_, err := pedro.ParseAndExecute(ctx, "Hi, I want to follow https://soundcloud.com/bizzarro_universe", userId)
 		assert.NoError(t, err)
 
-		artists, err := pedro.ListArtists(ctx, userId)
+		artists, err := pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(artists))
 
@@ -148,7 +148,7 @@ func TestFollowingArtists(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "You stopped following Bizzarro Universe", success)
 
-		artists, err = pedro.ListArtists(ctx, userId)
+		artists, err = pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(artists))
 	})
@@ -163,7 +163,7 @@ func TestFollowingArtists(t *testing.T) {
 		_, err := pedro.FollowArtist(ctx, bizzarro)
 		assert.NoError(t, err)
 
-		res, err := pedro.ListArtists(ctx, userId)
+		res, err := pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(res))
 
@@ -174,7 +174,7 @@ func TestFollowingArtists(t *testing.T) {
 		_, err = pedro.UnfollowArtist(ctx, cmd)
 		assert.Error(t, err)
 
-		res, err = pedro.ListArtists(ctx, userId)
+		res, err = pedro.ListArtists(ctx, internal.ListArtistsCmd{UserId: userId})
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(res))
 	})

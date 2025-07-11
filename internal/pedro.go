@@ -56,8 +56,8 @@ func (pedro *Pedro) ParseAndExecute(ctx context.Context, text string, userId Use
 	}
 }
 
-func (pedro *Pedro) ListArtists(ctx context.Context, userId UserId) (Artists, error) {
-	return pedro.service.ListArtists(ctx, userId)
+func (pedro *Pedro) ListArtists(ctx context.Context, cmd ListArtistsCmd) (Artists, error) {
+	return pedro.service.ListArtists(ctx, cmd)
 }
 
 func (pedro *Pedro) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
