@@ -52,5 +52,5 @@ func newProdPedro(cfg Config) *internal.Pedro {
 
 	ai := claude.NewClient(claude.ApiUrl, cfg.ClaudeApiKey)
 
-	return internal.NewPedro(db, sc, ai)
+	return internal.NewPedro(cfg.AllowedUserIds, db, sc, ai)
 }

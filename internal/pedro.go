@@ -11,11 +11,21 @@ type Pedro struct {
 	claude  Claude
 }
 
-func NewPedro(db *JsonDb, client Soundcloud, claude Claude) *Pedro {
-	return &Pedro{
+func NewPedro(userIds []int64, db *JsonDb, client Soundcloud, claude Claude) *Pedro {
+	p := &Pedro{
 		service: newService(db, client),
 		claude:  claude,
 	}
+
+	var err error
+	for _, id := range userIds {
+		err = p.service.CreateUser(id)
+	}
+	if err != nil {
+		log.Fatal("Could not add users")
+	}
+
+	return p
 }
 
 func (pedro *Pedro) ParseAndExecute(ctx context.Context, text string, userId UserId) (string, error) {
@@ -27,8 +37,9 @@ func (pedro *Pedro) ParseAndExecute(ctx context.Context, text string, userId Use
 	switch command.Command {
 	case ParsingCmdFollow:
 		c := FollowArtistCmd{
-			SoundcloudUrl: command.SoundcloudUrl,
-			UserId:        userId,
+			SoundcloudUrl:  command.SoundcloudUrl,
+			SoundcloudName: command.ArtistName,
+			UserId:         userId,
 		}
 		success, err := pedro.FollowArtist(ctx, c)
 		if err != nil {

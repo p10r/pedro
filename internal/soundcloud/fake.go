@@ -102,7 +102,7 @@ var (
 			{
 				Id:             34762414,
 				Urn:            "soundcloud:users:hovr-1",
-				Url:            "https://api.soundcloud.com/users/hovr-1",
+				Url:            "https://soundcloud.com/hovrmusic",
 				Username:       "HOVR",
 				FollowersCount: 11640,
 			},
@@ -123,18 +123,18 @@ var (
 		},
 		"bizzarro universe": {
 			{
-				Id:             550473735,
-				Urn:            "soundcloud:users:biz-1",
-				Url:            "https://api.soundcloud.com/users/biz-1",
-				Username:       "Bizzarro Universe",
-				FollowersCount: 3669,
-			},
-			{
 				Id:             148907910,
 				Urn:            "soundcloud:users:biz-2",
 				Url:            "https://api.soundcloud.com/users/biz-2",
 				Username:       "edible universe",
 				FollowersCount: 6,
+			},
+			{
+				Id:             550473735,
+				Urn:            "soundcloud:users:biz-1",
+				Url:            "https://soundcloud.com/bizzarro_universe",
+				Username:       "Bizzarro Universe",
+				FollowersCount: 3669,
 			},
 		},
 	}

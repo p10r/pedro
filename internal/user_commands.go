@@ -1,8 +1,9 @@
 package internal
 
 type FollowArtistCmd struct {
-	SoundcloudUrl string
-	UserId        UserId
+	SoundcloudUrl  string
+	SoundcloudName string
+	UserId         UserId
 }
 
 type UnfollowArtistCmd struct {

@@ -8,14 +8,11 @@ import (
 )
 
 type Fake struct {
-	t           *testing.T
-	artistRegex *regexp.Regexp
+	t *testing.T
 }
 
 func NewFake(t *testing.T) *Fake {
-	matchArtistRegex := `https?://(?:www\.)?soundcloud\.com/[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*(?:\?[^\s]*)?`
-	re := regexp.MustCompile(matchArtistRegex)
-	return &Fake{t: t, artistRegex: re}
+	return &Fake{t: t}
 }
 
 // ParseCommand represents poor man's AI
@@ -44,13 +41,28 @@ func (f *Fake) ParseCommand(text string) (internal.ParsingResult, error) {
 		}, nil
 	}
 
-	if strings.Contains(text, "follow") {
-		url := f.artistRegex.FindString(text)
+	// Follow by url
+	urlMatcher := `https?://(?:www\.)?soundcloud\.com/[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*(?:\?[^\s]*)?`
+	urlRegex := regexp.MustCompile(urlMatcher)
+	if strings.Contains(text, "follow") && strings.Contains(text, "http") {
+		url := urlRegex.FindString(text)
 
 		return internal.ParsingResult{
 			Command:       internal.ParsingCmdFollow,
 			SoundcloudUrl: url,
 			ArtistName:    "",
+		}, nil
+	}
+
+	pattern := `(?i)hovr|sinamin|anna reusch|bizzarro universe`
+	artistNameRegex := regexp.MustCompile(pattern)
+
+	// Follow by name
+	if strings.Contains(text, "follow") && artistNameRegex.MatchString(text) {
+		return internal.ParsingResult{
+			Command:       internal.ParsingCmdFollow,
+			SoundcloudUrl: "",
+			ArtistName:    artistNameRegex.FindString(text),
 		}, nil
 	}
 

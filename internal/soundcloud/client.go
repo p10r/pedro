@@ -116,13 +116,15 @@ func (c *Client) ArtistByQuery(query string) ([]internal.SoundcloudArtist, error
 		return []internal.SoundcloudArtist{}, fmt.Errorf("status code is %v", res.Status)
 	}
 
-	var artist []internal.SoundcloudArtist
-	err = json.NewDecoder(res.Body).Decode(&artist)
+	var artists []internal.SoundcloudArtist
+	err = json.NewDecoder(res.Body).Decode(&artists)
 	if err != nil {
 		return []internal.SoundcloudArtist{}, fmt.Errorf("soundcloud.Client: error when parsing json: %w", err)
 	}
-
-	return artist, nil
+	if artists == nil {
+		return []internal.SoundcloudArtist{}, nil
+	}
+	return artists, nil
 }
 
 func MustNewClient(t *testing.T, tokenUrl, apiUrl, clientId, clientSecret string) *Client {

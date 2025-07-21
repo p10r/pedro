@@ -3,7 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
-	"log"
+	"slices"
 	"strings"
 )
 
@@ -18,24 +18,17 @@ func newService(db *JsonDb, soundcloudClient Soundcloud) *service {
 	return &service{db: db, soundcloud: soundcloudClient}
 }
 
-func (service *service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (string, error) {
+func (service *service) FollowArtist(_ context.Context, cmd FollowArtistCmd) (string, error) {
 	id := int64(cmd.UserId)
 	user, found := service.db.Get(id)
 
-	// There's no explicit endpoint to add users, since access toggled via an env variable.
-	// This means that for now, every user who has API access will be created transparently in the DB, if missing.
 	if !found {
-		log.Printf("No user with id %v, creating a new entry", id)
-		err := service.createUser(id)
-		if err != nil {
-			return "", fmt.Errorf("got err when trying to create user: %w", err)
-		}
-		return service.FollowArtist(ctx, cmd)
+		return "", fmt.Errorf("no user with id %v", id)
 	}
 
-	scArtist, err := service.soundcloud.ArtistByUrl(cmd.SoundcloudUrl)
+	scArtist, err := service.findArtist(cmd)
 	if err != nil {
-		return "", fmt.Errorf("error when trying to find artist %service: %w", cmd.SoundcloudUrl, err)
+		return "", err
 	}
 
 	user.Artists = user.Artists.Put(ArtistEntity{
@@ -50,6 +43,37 @@ func (service *service) FollowArtist(ctx context.Context, cmd FollowArtistCmd) (
 	}
 
 	return scArtist.Username, nil
+}
+
+func (service *service) findArtist(cmd FollowArtistCmd) (SoundcloudArtist, error) {
+	if cmd.SoundcloudUrl != "" {
+		artist, err := service.soundcloud.ArtistByUrl(cmd.SoundcloudUrl)
+		if err != nil {
+			return SoundcloudArtist{}, fmt.Errorf("error when trying to find artist %s: %w", cmd.SoundcloudUrl, err)
+		}
+		return artist, nil
+	}
+
+	if cmd.SoundcloudName != "" {
+		artists, err := service.soundcloud.ArtistByQuery(cmd.SoundcloudName)
+		if err != nil {
+			return SoundcloudArtist{}, fmt.Errorf("error when trying to find artist %s: %w", cmd.SoundcloudUrl, err)
+		}
+		if len(artists) == 0 {
+			return SoundcloudArtist{}, fmt.Errorf("no artist found with name %s", cmd.SoundcloudName)
+		}
+		if len(artists) == 1 {
+			return artists[0], nil
+		}
+		// Soundcloud doesn't always return the best match, e.g., when searching for Anna Reusch.
+		// Here, we prioritize the follower count, expecting that this will provide better results to users.
+		artist := slices.MaxFunc(artists, func(a, b SoundcloudArtist) int {
+			return a.FollowersCount - b.FollowersCount
+		})
+		return artist, nil
+	}
+
+	return SoundcloudArtist{}, fmt.Errorf("neither soundcloud name nor url were provided")
 }
 
 func (service *service) UnfollowArtist(_ context.Context, cmd UnfollowArtistCmd) (artistName string, err error) {
@@ -100,7 +124,7 @@ func (service *service) ListArtists(_ context.Context, cmd ListArtistsCmd) (Arti
 	return artists, nil
 }
 
-func (service *service) createUser(id int64) error {
+func (service *service) CreateUser(id int64) error {
 	err := service.db.Save(UserEntity{
 		TelegramId: id,
 	})
