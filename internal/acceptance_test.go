@@ -71,10 +71,10 @@ func TestFollowingArtists(t *testing.T) {
 		name string
 		text string
 	}{
-		//{
-		//	name: "follow an artist via url through free text",
-		//	text: "Hi, I want to follow https://soundcloud.com/bizzarro_universe",
-		//},
+		{
+			name: "follow an artist via url through free text",
+			text: "Hi, I want to follow https://soundcloud.com/bizzarro_universe",
+		},
 		{
 			name: "follow an artist via name through free text",
 			text: "Hi, I want to follow Bizzarro Universe",
