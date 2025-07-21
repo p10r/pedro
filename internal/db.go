@@ -2,7 +2,11 @@ package internal
 
 import (
 	"crawshaw.dev/jsonfile"
+	"errors"
 	"fmt"
+	"io/fs"
+	"log"
+	"os"
 	"slices"
 )
 
@@ -59,10 +63,15 @@ type JsonDb struct {
 }
 
 func NewJsonDb(path string) (*JsonDb, error) {
-	db, err := jsonfile.New[UserEntities](path)
-	if err != nil {
-		return nil, fmt.Errorf("json db: failed creating repository: %w", err)
+	db, err := jsonfile.Load[UserEntities](path)
+	if os.IsNotExist(err) || errors.Is(err, fs.ErrNotExist) {
+		log.Printf("json db: no file found: %s, creating new one \n", path)
+		db, err = jsonfile.New[UserEntities](path)
+		if err != nil {
+			return nil, fmt.Errorf("json db: could not create file %s: %w", path, err)
+		}
 	}
+
 	return &JsonDb{db}, err
 }
 

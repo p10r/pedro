@@ -3,17 +3,31 @@ package internal_test
 import (
 	"github.com/alecthomas/assert/v2"
 	"github.com/p10r/pedro/internal"
+	"os"
 	"path/filepath"
 	"testing"
 )
 
 func mustNewRepo(t *testing.T) *internal.JsonDb {
+	return mustNewRepoWith(t, "")
+}
+
+func mustNewRepoWith(t *testing.T, fileContent string) *internal.JsonDb {
 	dir := t.TempDir()
-	path := filepath.Join(dir, "artists.json")
+	path := filepath.Join(dir, "artist.json")
+
+	if fileContent != "" {
+		err := os.WriteFile(path, []byte(fileContent), 0600)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
 	repo, err := internal.NewJsonDb(path)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	return repo
 }
 
@@ -60,4 +74,28 @@ func TestJsonFile(t *testing.T) {
 		assert.NotZero(t, user.Artists)
 		assert.Equal(t, "10 Mark DJ Team", user.Artists[0].Name)
 	})
+
+	t.Run("picks up changes in existing file", func(t *testing.T) {
+		existing := `
+			{
+			  "users": [
+			    {
+			      "telegramId": 1,
+			      "artists": [
+			        {
+			          "name": "Leo Schick",
+			          "soundcloudUrl": "https://soundcloud.com/randaleo",
+			          "soundcloudUrn": "urn-1"
+			        }
+			      ]
+			    }
+			  ]
+			}`
+
+		repo := mustNewRepoWith(t, existing)
+		user, found := repo.Get(1)
+		assert.True(t, found)
+		assert.Equal(t, "Leo Schick", user.Artists[0].Name)
+	})
+
 }
